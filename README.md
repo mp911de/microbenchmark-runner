@@ -18,6 +18,8 @@ public class SimpleBenchmark {
 
 Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line.  
 
+![Start JMH benchmark methods](src/main/resources/start-benchmark.png)
+
 
 # Reporting Issues
 
@@ -26,7 +28,7 @@ Microbenchmark Runner uses GitHub’s integrated issue tracking system to record
 * Before you log a bug, please search the issue tracker to see if someone has already reported the problem.
 * If the issue doesn’t already exist, create a new issue.
 * Please provide as much information as possible with the issue report, we like to know the version of Microbenchmark Runner that you are using, as well as your Operating System and JVM version.
-* If you need to paste code, or include a stack trace use Markdown +++```+++ escapes before and after your text.
+* If you need to paste code, or include a stack trace use Markdown \`\`\` escapes before and after your text.
 * If possible try to create a test-case or project that replicates the issue. 
 
 # Building from Source
