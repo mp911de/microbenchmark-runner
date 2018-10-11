@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jmh.mbr.core.model;
+package jmh.mbr.junit5.discovery.predicates;
+
+import java.lang.reflect.Method;
+import java.util.function.Predicate;
+
+import org.openjdk.jmh.annotations.Benchmark;
 
 /**
- * Marker interfaces for types implementing a benchmark component descriptor.
+ * {@link Predicate} to check whether a {@link Method} is a {@code @Benchmark} method.
  * 
  * @author Mark Paluch
- * @see BenchmarkClass
- * @see BenchmarkMethod
- * @see ParametrizedBenchmarkMethod
- * @see BenchmarkFixture
+ * @see IsBenchmarkClass
  */
-public interface BenchmarkDescriptor {}
+public enum IsBenchmarkMethod implements Predicate<Method> {
+
+	INSTANCE;
+
+	@Override
+	public boolean test(Method theMethod) {
+		return theMethod.isAnnotationPresent(Benchmark.class);
+	}
+}

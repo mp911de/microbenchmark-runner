@@ -16,7 +16,6 @@
 package jmh.mbr.core.model;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -30,7 +29,7 @@ import java.util.Map;
 @EqualsAndHashCode
 public class BenchmarkFixture implements BenchmarkDescriptor {
 
-	@Getter private final Map<String, Object> fixture;
+	private final Map<String, Object> fixture;
 
 	private BenchmarkFixture(Map<String, Object> fixture) {
 		this.fixture = fixture;
@@ -63,6 +62,10 @@ public class BenchmarkFixture implements BenchmarkDescriptor {
 		return new BenchmarkFixture(fixture);
 	}
 
+	public Map<String, Object> getFixture() {
+		return fixture;
+	}
+
 	public String getDisplayName() {
 
 		String name = fixture.toString();
@@ -73,9 +76,13 @@ public class BenchmarkFixture implements BenchmarkDescriptor {
 		return name;
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		final StringBuffer sb = new StringBuffer();
+		StringBuffer sb = new StringBuffer();
 		sb.append(getClass().getSimpleName());
 		sb.append(fixture);
 		return sb.toString();

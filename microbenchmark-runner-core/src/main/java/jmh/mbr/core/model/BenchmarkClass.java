@@ -15,8 +15,6 @@
  */
 package jmh.mbr.core.model;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -54,8 +52,12 @@ public class BenchmarkClass extends HierarchicalBenchmarkDescriptor {
 		return ((ClassDescriptor) getDescriptor()).benchmarkClass;
 	}
 
-	@RequiredArgsConstructor
 	private static class ClassDescriptor implements BenchmarkDescriptor {
+
 		private final Class<?> benchmarkClass;
+
+		private ClassDescriptor(Class<?> benchmarkClass) {
+			this.benchmarkClass = benchmarkClass;
+		}
 	}
 }

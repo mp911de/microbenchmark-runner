@@ -13,15 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jmh.mbr.core.model;
+package jmh.mbr.junit5.discovery;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
- * Marker interfaces for types implementing a benchmark component descriptor.
+ * Utility to obtain {@link ElementResolver}s.
  * 
  * @author Mark Paluch
- * @see BenchmarkClass
- * @see BenchmarkMethod
- * @see ParametrizedBenchmarkMethod
- * @see BenchmarkFixture
  */
-public interface BenchmarkDescriptor {}
+class ElementResolvers {
+
+	/**
+	 * @return a {@link Set} of known {@link ElementResolver}s.
+	 */
+	public static Set<ElementResolver> getResolvers() {
+
+		Set<ElementResolver> resolvers = new LinkedHashSet<>();
+		resolvers.add(new BenchmarkContainerResolver());
+		resolvers.add(new BenchmarkMethodResolver());
+		resolvers.add(new BenchmarkFixtureResolver());
+
+		return resolvers;
+	}
+}

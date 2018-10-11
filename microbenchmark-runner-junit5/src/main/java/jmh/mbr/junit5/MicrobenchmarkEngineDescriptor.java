@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jmh.mbr.core.model;
+package jmh.mbr.junit5;
+
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /**
- * Marker interfaces for types implementing a benchmark component descriptor.
+ * {@link EngineDescriptor} for Microbenchmark Runner.
  * 
  * @author Mark Paluch
- * @see BenchmarkClass
- * @see BenchmarkMethod
- * @see ParametrizedBenchmarkMethod
- * @see BenchmarkFixture
  */
-public interface BenchmarkDescriptor {}
+class MicrobenchmarkEngineDescriptor extends EngineDescriptor {
+
+	MicrobenchmarkEngineDescriptor(UniqueId uniqueId) {
+		super(uniqueId, "Microbenchmark Runner");
+	}
+}

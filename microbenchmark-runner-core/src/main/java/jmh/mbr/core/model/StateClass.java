@@ -15,6 +15,8 @@
  */
 package jmh.mbr.core.model;
 
+import lombok.RequiredArgsConstructor;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,13 +33,10 @@ import org.openjdk.jmh.annotations.State;
  * 
  * @author Mark Paluch
  */
+@RequiredArgsConstructor
 class StateClass {
 
 	private final Class<?> stateClass;
-
-	private StateClass(Class<?> stateClass) {
-		this.stateClass = stateClass;
-	}
 
 	/**
 	 * Create a {@link StateClass} given {@link Class}.

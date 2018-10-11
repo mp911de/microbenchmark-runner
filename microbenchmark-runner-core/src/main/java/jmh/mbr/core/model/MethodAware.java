@@ -15,13 +15,25 @@
  */
 package jmh.mbr.core.model;
 
+import java.lang.reflect.Method;
+
 /**
- * Marker interfaces for types implementing a benchmark component descriptor.
+ * Interface exposing {@link Method} awareness of a specific descriptor object.
  * 
  * @author Mark Paluch
- * @see BenchmarkClass
- * @see BenchmarkMethod
- * @see ParametrizedBenchmarkMethod
- * @see BenchmarkFixture
  */
-public interface BenchmarkDescriptor {}
+public interface MethodAware {
+
+	/**
+	 * @return the underlying method.
+	 */
+	Method getMethod();
+
+	/**
+	 * Check whether the given {@code method} is represented by this object.
+	 * 
+	 * @param method must not be {@literal null}.
+	 * @return
+	 */
+	boolean isUnderlyingMethod(Method method);
+}

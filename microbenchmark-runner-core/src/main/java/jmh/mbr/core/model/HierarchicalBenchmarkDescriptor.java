@@ -15,8 +15,6 @@
  */
 package jmh.mbr.core.model;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,13 +26,16 @@ import java.util.Objects;
  * 
  * @author Mark Paluch
  */
-@Getter
 public class HierarchicalBenchmarkDescriptor implements BenchmarkDescriptor {
 
 	private final BenchmarkDescriptor descriptor;
 	private final List<? extends BenchmarkDescriptor> children;
 
 	HierarchicalBenchmarkDescriptor(BenchmarkDescriptor descriptor, List<? extends BenchmarkDescriptor> children) {
+
+		Objects.requireNonNull(descriptor, "BenchmarkDescriptor must not be null!");
+		Objects.requireNonNull(children, "Children must not be null!");
+
 		this.descriptor = descriptor;
 		this.children = Collections.unmodifiableList(children);
 	}
@@ -66,5 +67,13 @@ public class HierarchicalBenchmarkDescriptor implements BenchmarkDescriptor {
 		Objects.requireNonNull(children, "Children must not be null!");
 
 		return new HierarchicalBenchmarkDescriptor(descriptor, new ArrayList<>(children));
+	}
+
+	public BenchmarkDescriptor getDescriptor() {
+		return descriptor;
+	}
+
+	public List<? extends BenchmarkDescriptor> getChildren() {
+		return children;
 	}
 }

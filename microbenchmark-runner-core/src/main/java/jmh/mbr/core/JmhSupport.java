@@ -16,7 +16,10 @@
 package jmh.mbr.core;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -24,10 +27,16 @@ import java.util.Date;
 
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Defaults;
 import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.format.OutputFormat;
+import org.openjdk.jmh.runner.format.OutputFormatFactory;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
+import org.openjdk.jmh.util.UnCloseablePrintStream;
+import org.openjdk.jmh.util.Utils;
 
 /**
  * @author Christoph Strobl
@@ -35,11 +44,6 @@ import org.openjdk.jmh.runner.options.TimeValue;
  */
 public class JmhSupport {
 
-	static final int WARMUP_ITERATIONS = 5;
-	static final int MEASUREMENT_ITERATIONS = 10;
-	static final int FORKS = 1;
-	static final String[] JVM_ARGS = { "-server", "-XX:+HeapDumpOnOutOfMemoryError", "-Xms1024m", "-Xmx1024m",
-			"-XX:MaxDirectMemorySize=1024m" };
 
 	/**
 	 * Collect all options for the {@link Runner}.
@@ -49,26 +53,25 @@ public class JmhSupport {
 	 */
 	public ChainedOptionsBuilder options(Class<?> jmhTestClass) throws Exception {
 
-		ChainedOptionsBuilder optionsBuilder = new OptionsBuilder().jvmArgs(jvmArgs());
+		ChainedOptionsBuilder optionsBuilder = options();
+		return report(optionsBuilder, jmhTestClass);
+	}
+
+	/**
+	 * Collect all options for the {@link Runner}.
+	 *
+	 * @return never {@literal null}.
+	 * @throws Exception
+	 */
+	public ChainedOptionsBuilder options() {
+
+		ChainedOptionsBuilder optionsBuilder = new OptionsBuilder();
 
 		optionsBuilder = warmup(optionsBuilder);
 		optionsBuilder = measure(optionsBuilder);
 		optionsBuilder = forks(optionsBuilder);
-		optionsBuilder = report(optionsBuilder, jmhTestClass);
 
 		return optionsBuilder;
-	}
-
-	/**
-	 * JVM args to apply to {@link Runner} via its {@link org.openjdk.jmh.runner.options.Options}.
-	 *
-	 * @return {@link #JVM_ARGS} by default.
-	 */
-	public String[] jvmArgs() {
-
-		String[] args = new String[JVM_ARGS.length];
-		System.arraycopy(JVM_ARGS, 0, args, 0, JVM_ARGS.length);
-		return args;
 	}
 
 	/**
@@ -279,5 +282,31 @@ public class JmhSupport {
 			System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
 		} */
 
+	}
+
+	public OutputFormat createOutputFormat(Options options) {
+
+		// sadly required here as the check cannot be made before calling this method in constructor
+		if (options == null) {
+			throw new IllegalArgumentException("Options not allowed to be null.");
+		}
+
+		PrintStream out;
+		if (options.getOutput().hasValue()) {
+			try {
+				out = new PrintStream(options.getOutput().get());
+			} catch (FileNotFoundException ex) {
+				throw new IllegalStateException(ex);
+			}
+		} else {
+			// Protect the System.out from accidental closing
+			try {
+				out = new UnCloseablePrintStream(System.out, Utils.guessConsoleEncoding());
+			} catch (UnsupportedEncodingException ex) {
+				throw new IllegalStateException(ex);
+			}
+		}
+
+		return OutputFormatFactory.createFormatInstance(out, options.verbosity().orElse(Defaults.VERBOSITY));
 	}
 }

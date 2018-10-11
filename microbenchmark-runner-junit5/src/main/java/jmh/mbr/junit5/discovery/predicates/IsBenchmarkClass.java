@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jmh.mbr.core.model;
+package jmh.mbr.junit5.discovery.predicates;
+
+import java.util.Arrays;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
- * Marker interfaces for types implementing a benchmark component descriptor.
+ * {@link Predicate} to check whether a {@link Class} contains {@code @Benchmark} methods.
  * 
  * @author Mark Paluch
- * @see BenchmarkClass
- * @see BenchmarkMethod
- * @see ParametrizedBenchmarkMethod
- * @see BenchmarkFixture
+ * @see IsBenchmarkMethod
  */
-public interface BenchmarkDescriptor {}
+public enum IsBenchmarkClass implements Predicate<Class<?>> {
+
+	INSTANCE;
+
+	@Override
+	public boolean test(Class<?> theClass) {
+		return Stream.concat(Arrays.stream(theClass.getDeclaredMethods()), Arrays.stream(theClass.getMethods()))
+				.anyMatch(IsBenchmarkMethod.INSTANCE);
+	}
+}

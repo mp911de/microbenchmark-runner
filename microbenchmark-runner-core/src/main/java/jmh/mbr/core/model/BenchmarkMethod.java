@@ -26,7 +26,7 @@ import java.util.Objects;
  * 
  * @author Mark Paluch
  */
-public class BenchmarkMethod implements BenchmarkDescriptor {
+public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 
 	private final Method method;
 
@@ -40,11 +40,22 @@ public class BenchmarkMethod implements BenchmarkDescriptor {
 		this.method = method;
 	}
 
-	/**
-	 * @return the underlying Java method.
+	/* 
+	 * (non-Javadoc)
+	 * @see jmh.mbr.core.model.MethodAware#getMethod()
 	 */
+	@Override
 	public Method getMethod() {
 		return method;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see jmh.mbr.core.model.MethodAware#isUnderlyingMethod(java.lang.reflect.Method)
+	 */
+	@Override
+	public boolean isUnderlyingMethod(Method method) {
+		return this.method.equals(method);
 	}
 
 	/**
@@ -82,6 +93,10 @@ public class BenchmarkMethod implements BenchmarkDescriptor {
 		return method.getDeclaringClass();
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!BenchmarkMethod.class.isInstance(obj)) {
@@ -90,6 +105,10 @@ public class BenchmarkMethod implements BenchmarkDescriptor {
 		return ((BenchmarkMethod) obj).method.equals(method);
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		return method.hashCode();
@@ -109,6 +128,10 @@ public class BenchmarkMethod implements BenchmarkDescriptor {
 		return method.getAnnotation(annotationType);
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return method.toString();

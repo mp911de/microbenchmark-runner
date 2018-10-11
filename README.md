@@ -9,6 +9,9 @@ Typically, JMH benchmarks are launched using the JMH runner or a tool chain plug
 
 Here is a quick teaser of a what Microbenchmark Runner can do for you:
 
+
+### JUnit 4.x
+
 ```java
 @RunWith(Microbenchmark.class)
 public class SimpleBenchmark {
@@ -18,7 +21,20 @@ public class SimpleBenchmark {
 }
 ```
 
-Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line.  
+Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. 
+
+### JUnit Jupiter Platform
+
+```java
+@Microbenchmark
+public class SimpleBenchmark {
+
+	@Benchmark
+	public void foo() {}
+}
+```
+
+Decorate your JMH benchmark with `@Microbenchmark`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. Adding `@Testable` to benchmark methods allows direct entry points to methods without the need to run the benchmark first.  
 
 ![Start JMH benchmark methods](src/main/resources/start-benchmark.png)
 

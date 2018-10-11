@@ -13,15 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jmh.mbr.core.model;
+package jmh.mbr.junit5;
+
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
 
 /**
- * Marker interfaces for types implementing a benchmark component descriptor.
- * 
  * @author Mark Paluch
- * @see BenchmarkClass
- * @see BenchmarkMethod
- * @see ParametrizedBenchmarkMethod
- * @see BenchmarkFixture
  */
-public interface BenchmarkDescriptor {}
+@Warmup(iterations = 1, time = 1)
+@Measurement(iterations = 1, time = 1)
+@Fork(value = 1, warmups = 1)
+@State(Scope.Benchmark)
+@Microbenchmark
+public class ParametrizedBenchmark {
+
+	@Param({ "a", "b" }) String foo;
+
+	@Benchmark
+	public void foo() {}
+}

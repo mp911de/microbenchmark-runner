@@ -64,7 +64,7 @@ public class BenchmarkDescriptorFactory {
 
 				List<BenchmarkFixture> fixtures = createFixtures(it);
 
-				return new HierarchicalBenchmarkDescriptor(it, fixtures);
+				return new ParametrizedBenchmarkMethod(it, fixtures);
 			}
 
 			return it;

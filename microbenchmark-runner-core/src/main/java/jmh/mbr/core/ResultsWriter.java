@@ -28,7 +28,6 @@ import org.openjdk.jmh.results.format.ResultFormatType;
 
 /**
  * @author Christoph Strobl
- * @since 2.0
  */
 interface ResultsWriter {
 
