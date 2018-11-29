@@ -28,7 +28,7 @@ import org.junit.platform.engine.UniqueId;
 
 /**
  * Microbenchmark Runner Engine.
- * 
+ *
  * @author Mark Paluch
  */
 public class MicrobenchmarkEngine implements TestEngine {
@@ -55,7 +55,7 @@ public class MicrobenchmarkEngine implements TestEngine {
 
 	@Override
 	public Optional<String> getGroupId() {
-		return Optional.of("biz.paluch.experimental.jmh");
+		return Optional.of("com.github.mp911de.microbenchmark-runner");
 	}
 
 	@Override
