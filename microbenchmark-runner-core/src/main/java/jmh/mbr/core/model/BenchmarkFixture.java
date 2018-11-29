@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Represents a parametrized fixture.
- * 
+ *
  * @author Mark Paluch
  */
 @EqualsAndHashCode
@@ -37,10 +37,11 @@ public class BenchmarkFixture implements BenchmarkDescriptor {
 
 	/**
 	 * Create a {@link BenchmarkFixture}.
-	 * 
-	 * @param name
-	 * @param parameter
-	 * @return
+	 *
+	 * @param name name of the fixture parameter. Typically a field name.
+	 * @param parameter value of the fixture parameter.
+	 * @return the {@link BenchmarkFixture}.
+	 * @see org.openjdk.jmh.annotations.Param
 	 */
 	public static BenchmarkFixture create(String name, String parameter) {
 		return new BenchmarkFixture(Collections.singletonMap(name, parameter));
@@ -48,10 +49,10 @@ public class BenchmarkFixture implements BenchmarkDescriptor {
 
 	/**
 	 * Create an enhanced {@link BenchmarkFixture} that contains all parameter values and the given parameter tuple.
-	 * 
-	 * @param name
-	 * @param parameter
-	 * @return
+	 *
+	 * @param name name of the fixture parameter. Typically a field name.
+	 * @param parameter value of the fixture parameter.
+	 * @return the {@link BenchmarkFixture}.
 	 */
 	public BenchmarkFixture enhance(String name, String parameter) {
 
@@ -76,7 +77,7 @@ public class BenchmarkFixture implements BenchmarkDescriptor {
 		return name;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

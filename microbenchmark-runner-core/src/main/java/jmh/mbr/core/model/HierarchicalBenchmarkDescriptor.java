@@ -23,7 +23,7 @@ import java.util.Objects;
 
 /**
  * {@link BenchmarkDescriptor} that represents a hierarchy of benchmark configurations.
- * 
+ *
  * @author Mark Paluch
  */
 public class HierarchicalBenchmarkDescriptor implements BenchmarkDescriptor {
@@ -42,9 +42,9 @@ public class HierarchicalBenchmarkDescriptor implements BenchmarkDescriptor {
 
 	/**
 	 * Create a {@link HierarchicalBenchmarkDescriptor} without children.
-	 * 
-	 * @param descriptor
-	 * @return
+	 *
+	 * @param descriptor the {@link BenchmarkDescriptor} that hosts benchmark.
+	 * @return the {@link HierarchicalBenchmarkDescriptor} for {@link BenchmarkDescriptor}.
 	 */
 	public static HierarchicalBenchmarkDescriptor create(BenchmarkDescriptor descriptor) {
 
@@ -55,10 +55,10 @@ public class HierarchicalBenchmarkDescriptor implements BenchmarkDescriptor {
 
 	/**
 	 * Create a {@link HierarchicalBenchmarkDescriptor} with children.
-	 * 
-	 * @param descriptor
-	 * @param children
-	 * @return
+	 *
+	 * @param descriptor the {@link BenchmarkDescriptor} that hosts benchmark.
+	 * @param children benchmark children.
+	 * @return the {@link HierarchicalBenchmarkDescriptor} for {@link BenchmarkDescriptor}.
 	 */
 	public static HierarchicalBenchmarkDescriptor create(BenchmarkDescriptor descriptor,
 			Collection<BenchmarkDescriptor> children) {

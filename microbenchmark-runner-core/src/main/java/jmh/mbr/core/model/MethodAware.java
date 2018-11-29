@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 
 /**
  * Interface exposing {@link Method} awareness of a specific descriptor object.
- * 
+ *
  * @author Mark Paluch
  */
 public interface MethodAware {
@@ -31,9 +31,9 @@ public interface MethodAware {
 
 	/**
 	 * Check whether the given {@code method} is represented by this object.
-	 * 
+	 *
 	 * @param method must not be {@literal null}.
-	 * @return
+	 * @return {@literal true} if the underlying {@link Method} is {@code method.}
 	 */
 	boolean isUnderlyingMethod(Method method);
 }

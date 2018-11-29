@@ -22,7 +22,7 @@ import java.util.Iterator;
  * Miscellaneous {@link String} utility methods.
  * <p>
  * Mainly for internal use within the framework
- * 
+ *
  * @author Mark Paluch
  */
 public class StringUtils {
@@ -39,8 +39,9 @@ public class StringUtils {
 	 * <p>
 	 * The Object signature is useful for general attribute handling code that commonly deals with Strings but generally
 	 * has to iterate over Objects since attributes may e.g. be primitive value objects as well.
-	 * 
+	 *
 	 * @param str the candidate String
+	 * @return {@literal true} if the string is empty.
 	 */
 	public static boolean isEmpty(Object str) {
 		return (str == null || "".equals(str));
@@ -51,7 +52,7 @@ public class StringUtils {
 	 * <p>
 	 * More specifically, this method returns {@code true} if the {@code String} is not {@code null}, its length is
 	 * greater than 0, and it contains at least one non-whitespace character.
-	 * 
+	 *
 	 * @param str the {@code String} to check (may be {@code null})
 	 * @return {@code true} if the {@code String} is not {@code null}, its length is greater than 0, and it does not
 	 *         contain whitespace only
@@ -74,7 +75,7 @@ public class StringUtils {
 	 * Convert a {@code Collection} into a delimited {@code String} (e.g. CSV).
 	 * <p>
 	 * Useful for {@code toString()} implementations.
-	 * 
+	 *
 	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
 	 * @param delim the delimiter to use (typically a ",")
 	 * @return the delimited {@code String}
@@ -87,7 +88,7 @@ public class StringUtils {
 	 * Convert a {@code Collection} into a delimited {@code String} (e.g., CSV).
 	 * <p>
 	 * Useful for {@code toString()} implementations.
-	 * 
+	 *
 	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
 	 * @return the delimited {@code String}
 	 */
@@ -99,7 +100,7 @@ public class StringUtils {
 	 * Convert a {@link Collection} to a delimited {@code String} (e.g. CSV).
 	 * <p>
 	 * Useful for {@code toString()} implementations.
-	 * 
+	 *
 	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
 	 * @param delim the delimiter to use (typically a ",")
 	 * @param prefix the {@code String} to start each element with

@@ -44,12 +44,12 @@ import org.openjdk.jmh.util.Utils;
  */
 public class JmhSupport {
 
-
 	/**
 	 * Collect all options for the {@link Runner}.
 	 *
+	 * @param jmhTestClass class under benchmark.
 	 * @return never {@literal null}.
-	 * @throws Exception
+	 * @throws Exception the offending exception raised by JMH
 	 */
 	public ChainedOptionsBuilder options(Class<?> jmhTestClass) throws Exception {
 
@@ -61,7 +61,6 @@ public class JmhSupport {
 	 * Collect all options for the {@link Runner}.
 	 *
 	 * @return never {@literal null}.
-	 * @throws Exception
 	 */
 	public ChainedOptionsBuilder options() {
 
@@ -84,7 +83,7 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Read {@code measurementIterations} property from {@link org.springframework.core.env.Environment}.
+	 * Read {@code measurementIterations} property from {@link jmh.mbr.core.Environment}.
 	 *
 	 * @return -1 if not set.
 	 */
@@ -130,10 +129,11 @@ public class JmhSupport {
 	}
 
 	/**
-	 * {@code project.version_yyyy-MM-dd_ClassName.json} eg.
-	 * {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
+	 * Returns the report file name for {@link Class class under benchmark}.
 	 *
-	 * @return
+	 * @param jmhTestClass class under benchmark.
+	 * @return the report file name such as {@code project.version_yyyy-MM-dd_ClassName.json} eg. *
+	 *         {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
 	 */
 	public String reportFilename(Class<?> jmhTestClass) {
 
@@ -254,9 +254,9 @@ public class JmhSupport {
 
 	/**
 	 * Resolve the given resource location to a {@code java.io.File}, i.e. to a file in the file system.
-	 * 
-	 * @param resourceLocation
-	 * @return
+	 *
+	 * @param resourceLocation the resource location.
+	 * @return {@link File} for {@code resourceLocation}.
 	 */
 	private File getFile(String resourceLocation) {
 		return new File(URI.create(resourceLocation));

@@ -22,7 +22,7 @@ import java.util.Objects;
 
 /**
  * {@link BenchmarkDescriptor} for a single {@link Class benchmark class} along its children.
- * 
+ *
  * @author Mark Paluch
  * @see BenchmarkMethod
  * @see HierarchicalBenchmarkDescriptor
@@ -35,10 +35,10 @@ public class BenchmarkClass extends HierarchicalBenchmarkDescriptor {
 
 	/**
 	 * Create a new {@link BenchmarkClass} given {@link Class the benchmark class} and its children.
-	 * 
-	 * @param benchmarkClass
-	 * @param children
-	 * @return
+	 *
+	 * @param benchmarkClass the actual {@link Class benchmark class} to inspect.
+	 * @param children child descriptors.
+	 * @return the {@link BenchmarkClass} descriptor.
 	 */
 	public static BenchmarkClass create(Class<?> benchmarkClass, Collection<? extends BenchmarkDescriptor> children) {
 

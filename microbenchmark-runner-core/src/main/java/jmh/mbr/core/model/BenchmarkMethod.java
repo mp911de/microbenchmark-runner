@@ -23,7 +23,7 @@ import java.util.Objects;
 
 /**
  * {@link BenchmarkDescriptor} for a {@link org.openjdk.jmh.annotations.Benchmark} {@link Method}.
- * 
+ *
  * @author Mark Paluch
  */
 public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
@@ -31,7 +31,9 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 	private final Method method;
 
 	/**
-	 * Returns a new {@link BenchmarkMethod} for {@link Method}.
+	 * Creates a new {@link BenchmarkMethod} for {@link Method}.
+	 *
+	 * @param method the underlying {@link Method}.
 	 */
 	public BenchmarkMethod(Method method) {
 
@@ -40,7 +42,7 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		this.method = method;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see jmh.mbr.core.model.MethodAware#getMethod()
 	 */
@@ -49,7 +51,7 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		return method;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see jmh.mbr.core.model.MethodAware#isUnderlyingMethod(java.lang.reflect.Method)
 	 */
@@ -93,7 +95,7 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		return method.getDeclaringClass();
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -105,7 +107,7 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		return ((BenchmarkMethod) obj).method.equals(method);
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -115,7 +117,7 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 	}
 
 	/**
-	 * Returns the annotations on this method
+	 * @return the annotations on this method.
 	 */
 	public Annotation[] getAnnotations() {
 		return method.getAnnotations();
@@ -123,12 +125,16 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 
 	/**
 	 * Returns the annotation of type {@code annotationType} on this method, if one exists.
+	 *
+	 * @param annotationType type of annotation to retrieve.
+	 * @param <T> annotation type.
+	 * @return the annotation or {@literal null} if not found.
 	 */
 	public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
 		return method.getAnnotation(annotationType);
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -138,7 +144,7 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 	}
 
 	/**
-	 * Returns {@literal true} whether the method is a parametrized one.
+	 * @return {@literal true} whether the method is a parametrized one.
 	 */
 	public boolean isParametrized() {
 

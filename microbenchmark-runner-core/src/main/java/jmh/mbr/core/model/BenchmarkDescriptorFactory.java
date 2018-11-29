@@ -35,7 +35,7 @@ import org.openjdk.jmh.annotations.Benchmark;
 
 /**
  * Factory to create a {@link BenchmarkDescriptor} from a benchmark class.
- * 
+ *
  * @author Mark Paluch
  */
 public class BenchmarkDescriptorFactory {
@@ -75,8 +75,8 @@ public class BenchmarkDescriptorFactory {
 
 	/**
 	 * Creates {@link BenchmarkFixture} for a parametrized {@link BenchmarkMethod}.
-	 * 
-	 * @param method
+	 *
+	 * @param method the {@link BenchmarkMethod} to inspect.
 	 * @return list of fixtures if parameterized. Empty list if the method is not parametrized.
 	 */
 	public List<BenchmarkFixture> createFixtures(BenchmarkMethod method) {

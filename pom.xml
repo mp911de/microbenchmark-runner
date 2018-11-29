@@ -29,7 +29,7 @@
 		<junit4.version>4.12</junit4.version>
 		<junit5.version>5.3.1</junit5.version>
 	</properties>
-	
+
 	<url>http://github.com/mp911de/microbenchmark-runner</url>
 
     <licenses>
@@ -49,7 +49,7 @@
         <system>Github</system>
         <url>https://github.com/mp911de/microbenchmark-runner/issues</url>
     </issueManagement>
-	
+
 	<scm>
         <connection>scm:git:https://github.com/mp911de/microbenchmark-runner.git</connection>
         <developerConnection>scm:git:https://github.com/mp911de/microbenchmark-runner.git</developerConnection>
@@ -106,6 +106,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>javadoc</id>
@@ -121,6 +122,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>

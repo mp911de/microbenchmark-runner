@@ -26,10 +26,10 @@ import org.junit.platform.commons.annotation.Testable;
 /**
  * {@code @Microbenchmark} is used to signal that the annotated type is a <em>microbenchmark class</em> that should be
  * ran using the Microbenchmark Runner.
- * <p/>
+ * <p>
  * Benchmark classes executed with the Microbenchmark Runner can participate in tooling support without the need to
  * integrate with JMH-specific tool support.
- * 
+ *
  * @author Mark Paluch
  */
 @Retention(RetentionPolicy.SOURCE)
