@@ -24,7 +24,6 @@ import java.util.Iterator;
  * Mainly for internal use within the framework
  * 
  * @author Mark Paluch
- * @see org.springframework.util.StringUtils
  */
 public class StringUtils {
 
@@ -56,7 +55,6 @@ public class StringUtils {
 	 * @param str the {@code String} to check (may be {@code null})
 	 * @return {@code true} if the {@code String} is not {@code null}, its length is greater than 0, and it does not
 	 *         contain whitespace only
-	 * @see #hasText(CharSequence)
 	 */
 	public static boolean hasText(String str) {
 		return (str != null && !str.isEmpty() && containsText(str));

@@ -75,7 +75,7 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Read {@code warmupIterations} property from {@link org.springframework.core.env.Environment}.
+	 * Read {@code warmupIterations} property from {@link jmh.mbr.core.Environment}.
 	 *
 	 * @return -1 if not set.
 	 */
@@ -94,7 +94,7 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Read {@code forks} property from {@link org.springframework.core.env.Environment}.
+	 * Read {@code forks} property from {@link jmh.mbr.core.Environment}.
 	 *
 	 * @return -1 if not set.
 	 */
@@ -103,7 +103,7 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Read {@code benchmarkReportDir} property from {@link org.springframework.core.env.Environment}.
+	 * Read {@code benchmarkReportDir} property from {@link jmh.mbr.core.Environment}.
 	 *
 	 * @return {@literal null} if not set.
 	 */
@@ -112,7 +112,7 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Read {@code measurementTime} property from {@link org.springframework.core.env.Environment}.
+	 * Read {@code measurementTime} property from {@link jmh.mbr.core.Environment}.
 	 *
 	 * @return -1 if not set.
 	 */
@@ -121,7 +121,7 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Read {@code warmupTime} property from {@link org.springframework.core.env.Environment}.
+	 * Read {@code warmupTime} property from {@link jmh.mbr.core.Environment}.
 	 *
 	 * @return -1 if not set.
 	 */
