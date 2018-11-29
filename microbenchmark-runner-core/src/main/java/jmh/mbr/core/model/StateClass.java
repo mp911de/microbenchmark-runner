@@ -15,8 +15,6 @@
  */
 package jmh.mbr.core.model;
 
-import lombok.RequiredArgsConstructor;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +25,8 @@ import java.util.stream.Stream;
 
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.State;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Value object to encapsulate a JMH {@code @State} class.
@@ -64,7 +64,9 @@ class StateClass {
 			return false;
 		}
 
-		return Stream.concat(Arrays.stream(stateClass.getFields()), Arrays.stream(stateClass.getDeclaredFields()))
+		return Stream
+				.concat(Arrays.stream(stateClass.getFields()),
+						Arrays.stream(stateClass.getDeclaredFields()))
 				.anyMatch(it -> it.isAnnotationPresent(Param.class));
 	}
 
@@ -76,8 +78,17 @@ class StateClass {
 
 		Param annotation = field.getAnnotation(Param.class);
 
+		if (annotation != null
+				&& (annotation.value().length == 0 || (annotation.value().length == 1
+						&& annotation.value()[0].equals(Param.BLANK_ARGS)))
+				&& field.getType().isEnum()) {
+			return Arrays.asList(field.getType().getEnumConstants()).stream()
+					.map(Object::toString).collect(Collectors.toList());
+		}
+
 		if (annotation == null || annotation.value().length == 0
-				|| (annotation.value().length == 1 && annotation.value()[0].equals(Param.BLANK_ARGS))) {
+				|| (annotation.value().length == 1
+						&& annotation.value()[0].equals(Param.BLANK_ARGS))) {
 			return Collections.emptyList();
 		}
 
@@ -89,7 +100,9 @@ class StateClass {
 	 */
 	public List<Field> getParametrizedFields() {
 
-		return Stream.concat(Arrays.stream(stateClass.getFields()), Arrays.stream(stateClass.getDeclaredFields()))
+		return Stream
+				.concat(Arrays.stream(stateClass.getFields()),
+						Arrays.stream(stateClass.getDeclaredFields()))
 				.filter(it -> it.isAnnotationPresent(Param.class)) //
 				.distinct() //
 				.collect(Collectors.toList());
