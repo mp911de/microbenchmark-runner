@@ -9,15 +9,21 @@ Typically, JMH benchmarks are launched using the JMH runner or a tool chain plug
 
 Here is a quick teaser of a what Microbenchmark Runner can do for you:
 
-
 ### JUnit 4.x
 
 ```java
 @RunWith(Microbenchmark.class)
 public class SimpleBenchmark {
 
-	@Benchmark
-	public void foo() {}
+    @State
+    static class MyParameters {
+
+        @Param({"1", "10", "100"}) // renders parametrized benchmarks as sub-tests
+        String batchSize;
+    }
+    
+    @Benchmark
+    public void foo(MyParameters myParameters) {}
 }
 ```
 
@@ -29,8 +35,15 @@ Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're ab
 @Microbenchmark
 public class SimpleBenchmark {
 
-	@Benchmark
-	public void foo() {}
+    @State
+    static class MyParameters {
+
+        @Param({"1", "10", "100"})  // renders parametrized benchmarks as sub-tests
+        String batchSize;
+    }
+    
+    @Benchmark
+    public void foo(MyParameters myParameters) {}
 }
 ```
 
