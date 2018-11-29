@@ -32,8 +32,9 @@ import org.openjdk.jmh.annotations.State;
 
 /**
  * Unit tests for {@link BenchmarkDescriptorFactory}.
- * 
+ *
  * @author Mark Paluch
+ * @author Dave Syer
  */
 class BenchmarkDescriptorFactoryUnitTests {
 
@@ -97,6 +98,16 @@ class BenchmarkDescriptorFactoryUnitTests {
 		assertThat(fixtures).hasSize(3);
 	}
 
+	@Test
+	public void shouldCreateMultipleFixturesEnumParametrizedBenchmarkClass() {
+
+		BenchmarkDescriptorFactory factory = BenchmarkDescriptorFactory.create(EnumParametrizedBenchmarkClass.class);
+		BenchmarkMethod single = factory.getRequiredBenchmarkMethod("simple");
+
+		List<BenchmarkFixture> fixtures = factory.createFixtures(single);
+		assertThat(fixtures).hasSize(3);
+	}
+
 	static class BenchmarkClass {
 
 		@Benchmark
@@ -153,6 +164,21 @@ class BenchmarkDescriptorFactoryUnitTests {
 	static class ParametrizedBenchmarkClass {
 
 		@Param({ "1", "2", "3" }) String foo;
+
+		@Benchmark
+		void simple() {
+
+		}
+	}
+
+	@State(Scope.Benchmark)
+	static class EnumParametrizedBenchmarkClass {
+
+		public static enum Sample {
+			ONE, TWO, THREE
+		}
+
+		@Param Sample foo;
 
 		@Benchmark
 		void simple() {

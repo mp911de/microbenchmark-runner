@@ -30,8 +30,9 @@ import org.openjdk.jmh.annotations.State;
 
 /**
  * Value object to encapsulate a JMH {@code @State} class.
- * 
+ *
  * @author Mark Paluch
+ * @author Dave Syer
  */
 @RequiredArgsConstructor
 class StateClass {
@@ -40,7 +41,7 @@ class StateClass {
 
 	/**
 	 * Create a {@link StateClass} given {@link Class}.
-	 * 
+	 *
 	 * @param stateClass
 	 * @return
 	 */
@@ -75,6 +76,14 @@ class StateClass {
 	public static List<String> getParameterValues(Field field) {
 
 		Param annotation = field.getAnnotation(Param.class);
+
+		if (annotation != null
+				&& (annotation.value().length == 0
+						|| (annotation.value().length == 1 && annotation.value()[0].equals(Param.BLANK_ARGS)))
+				&& field.getType().isEnum()) {
+			return Arrays.asList(field.getType().getEnumConstants()).stream().map(Object::toString)
+					.collect(Collectors.toList());
+		}
 
 		if (annotation == null || annotation.value().length == 0
 				|| (annotation.value().length == 1 && annotation.value()[0].equals(Param.BLANK_ARGS))) {
