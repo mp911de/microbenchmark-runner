@@ -41,6 +41,7 @@ import org.openjdk.jmh.util.Utils;
 /**
  * @author Christoph Strobl
  * @author Mark Paluch
+ * @author Dave Syer
  */
 public class JmhSupport {
 
@@ -71,6 +72,15 @@ public class JmhSupport {
 		optionsBuilder = forks(optionsBuilder);
 
 		return optionsBuilder;
+	}
+
+	/**
+	 * Read {@code benchmarksEnabled} property from {@link jmh.mbr.core.Environment}.
+	 *
+	 * @return true if not set.
+	 */
+	public boolean isEnabled() {
+		return Boolean.valueOf(Environment.getProperty("benchmarksEnabled", "true"));
 	}
 
 	/**
@@ -276,17 +286,17 @@ public class JmhSupport {
 		String uri = Environment.getProperty("publishTo");
 		// TODO: Registry?
 		/*
-		try {
-			ResultsWriter.forUri(uri).write(results);
-		} catch (Exception e) {
-			System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
-		} */
+		 * try { ResultsWriter.forUri(uri).write(results); } catch (Exception e) {
+		 * System.err.println(String.
+		 * format("Cannot save benchmark results to '%s'. Error was %s.", uri, e)); }
+		 */
 
 	}
 
 	public OutputFormat createOutputFormat(Options options) {
 
-		// sadly required here as the check cannot be made before calling this method in constructor
+		// sadly required here as the check cannot be made before calling this method in
+		// constructor
 		if (options == null) {
 			throw new IllegalArgumentException("Options not allowed to be null.");
 		}
