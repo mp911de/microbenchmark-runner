@@ -85,6 +85,20 @@ and one of the dependencies:
 	</dependency>
 ```
 
+# Configuration
+
+You can configure the runner by using System Properties and Environment Variables to control behavior of the following parameters:
+
+* `benchmarksEnabled` (`boolean`, defaults to `true`) Controls whether benchmarks should be executed. Setting `benchmarksEnabled=false` can be useful for conditional execution of benchmarks.
+* `warmupIterations` (`integer`, defaults to `-1`) Global override of warmup iterations. Uses `@Warmup` or JMH defaults if set to `-1`
+* `warmupTime` (`integer`, defaults to `-1`) Global override of warmup time. Uses `@Warmup` or JMH defaults if set to `-1`. 
+* `measurementIterations` (`integer`, defaults to `-1`) Global override of measurement iterations. Uses `@Measurement` or JMH defaults if set to `-1`. 
+* `measurementTime` (`integer`, defaults to `-1`) Global override of measurement time. Uses `@Measurement` or JMH defaults if set to `-1`. 
+* `forks` (`integer`, defaults to `-1`) Global override of number of forks. Uses `@Fork` or JMH defaults if set to `-1`.
+
+# Limitations
+
+Microbenchmark Runner uses JUnit infrastructure to select Benchmarks to run and JUnit's progress reporting. Benchmarks are delegated to JMH's Runner Engine for execution. In consequence, JUnit annotations such as `@Before`, `@BeforeEach`, `@BeforeAll`, and others do not have any effect as they are not considered by the execution engine.  
 
 # Reporting Issues
 
