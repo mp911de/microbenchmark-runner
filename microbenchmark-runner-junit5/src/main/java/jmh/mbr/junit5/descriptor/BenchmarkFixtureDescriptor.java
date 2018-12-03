@@ -15,28 +15,36 @@
  */
 package jmh.mbr.junit5.descriptor;
 
+import java.util.Set;
+
 import jmh.mbr.core.model.BenchmarkFixture;
 import jmh.mbr.core.model.BenchmarkMethod;
-
+import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /**
  * {@link org.junit.platform.engine.TestDescriptor} for a {@link BenchmarkFixture}.
- * 
+ *
  * @author Mark Paluch
  */
-public class BenchmarkFixtureDescriptor extends AbstractTestDescriptor {
+public class BenchmarkFixtureDescriptor extends AbstractBenchmarkDescriptor {
 
 	private final BenchmarkFixture fixture;
+	private final Set<TestTag> tags;
 
 	public BenchmarkFixtureDescriptor(UniqueId uniqueId, BenchmarkMethod method, BenchmarkFixture fixture) {
 		super(uniqueId, fixture.getDisplayName(), MethodSource.from(method.getMethod()));
 		this.fixture = fixture;
+		this.tags = DescriptorUtils.getTags(method.getDeclaringClass());
 	}
 
-	/* 
+	@Override
+	public Set<TestTag> getTags() {
+		return tags;
+	}
+
+	/*
 	 * (non-Javadoc)
 	 * @see org.junit.platform.engine.TestDescriptor#getType()
 	 */

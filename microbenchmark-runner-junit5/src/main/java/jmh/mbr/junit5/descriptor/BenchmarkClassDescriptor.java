@@ -16,17 +16,16 @@
 package jmh.mbr.junit5.descriptor;
 
 import jmh.mbr.core.model.BenchmarkClass;
-
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /**
  * {@link org.junit.platform.engine.TestDescriptor} for a {@link BenchmarkClass}.
- * 
+ *
  * @author Mark Paluch
  */
-public class BenchmarkClassDescriptor extends AbstractTestDescriptor {
+public class BenchmarkClassDescriptor extends AbstractBenchmarkDescriptor {
+
 
 	private final BenchmarkClass benchmarkClass;
 
@@ -36,7 +35,7 @@ public class BenchmarkClassDescriptor extends AbstractTestDescriptor {
 		this.benchmarkClass = benchmarkClass;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.junit.platform.engine.TestDescriptor#getType()
 	 */

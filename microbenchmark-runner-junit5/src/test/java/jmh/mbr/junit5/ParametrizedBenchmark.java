@@ -15,6 +15,7 @@
  */
 package jmh.mbr.junit5;
 
+import org.junit.jupiter.api.Tag;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
@@ -31,6 +32,7 @@ import org.openjdk.jmh.annotations.Warmup;
 @Fork(value = 1, warmups = 1)
 @State(Scope.Benchmark)
 @Microbenchmark
+@Tag("foo")
 public class ParametrizedBenchmark {
 
 	@Param({ "a", "b" }) String foo;

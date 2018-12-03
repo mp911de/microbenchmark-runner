@@ -15,32 +15,30 @@
  */
 package jmh.mbr.junit5.descriptor;
 
-import jmh.mbr.core.model.BenchmarkMethod;
-import jmh.mbr.core.model.MethodAware;
-
 import java.lang.reflect.Method;
 
+import jmh.mbr.core.model.BenchmarkMethod;
+import jmh.mbr.core.model.MethodAware;
 import org.junit.platform.commons.util.ClassUtils;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /**
  * {@link org.junit.platform.engine.TestDescriptor} for a {@link BenchmarkMethod}.
- * 
+ *
  * @author Mark Paluch
  */
-public class BenchmarkMethodDescriptor extends AbstractTestDescriptor implements MethodAware {
+public class BenchmarkMethodDescriptor extends AbstractBenchmarkDescriptor implements MethodAware {
 
 	private final BenchmarkMethod method;
 
-	public BenchmarkMethodDescriptor(UniqueId uniqueId, BenchmarkMethod benchmarkMethod) {
-		super(uniqueId, generateDefaultDisplayName(benchmarkMethod),
-				MethodSource.from(benchmarkMethod.getDeclaringClass(), benchmarkMethod.getMethod()));
-		this.method = benchmarkMethod;
+	public BenchmarkMethodDescriptor(UniqueId uniqueId, BenchmarkMethod method) {
+		super(uniqueId, generateDefaultDisplayName(method),
+				MethodSource.from(method.getDeclaringClass(), method.getMethod()));
+		this.method = method;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.junit.platform.engine.TestDescriptor#getType()
 	 */
@@ -49,7 +47,7 @@ public class BenchmarkMethodDescriptor extends AbstractTestDescriptor implements
 		return Type.TEST;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.junit.platform.engine.TestDescriptor#getLegacyReportingName()
 	 */
@@ -58,7 +56,7 @@ public class BenchmarkMethodDescriptor extends AbstractTestDescriptor implements
 		return generateDefaultDisplayName(method.getMethod());
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see jmh.mbr.core.model.MethodAware#getMethod()
 	 */
@@ -67,7 +65,7 @@ public class BenchmarkMethodDescriptor extends AbstractTestDescriptor implements
 		return method.getMethod();
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see jmh.mbr.core.model.MethodAware#isUnderlyingMethod(java.lang.reflect.Method)
 	 */

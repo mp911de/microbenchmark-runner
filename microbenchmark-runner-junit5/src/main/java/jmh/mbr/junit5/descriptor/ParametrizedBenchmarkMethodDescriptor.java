@@ -15,23 +15,21 @@
  */
 package jmh.mbr.junit5.descriptor;
 
+import java.lang.reflect.Method;
+
 import jmh.mbr.core.model.BenchmarkMethod;
 import jmh.mbr.core.model.MethodAware;
 import jmh.mbr.core.model.ParametrizedBenchmarkMethod;
-
-import java.lang.reflect.Method;
-
 import org.junit.platform.commons.util.ClassUtils;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /**
  * {@link org.junit.platform.engine.TestDescriptor} for a parametrized {@link BenchmarkMethod} with fixtures.
- * 
+ *
  * @author Mark Paluch
  */
-public class ParametrizedBenchmarkMethodDescriptor extends AbstractTestDescriptor implements MethodAware {
+public class ParametrizedBenchmarkMethodDescriptor extends AbstractBenchmarkDescriptor implements MethodAware {
 
 	private final BenchmarkMethod method;
 	private final ParametrizedBenchmarkMethod parametrizedMethod;
@@ -41,14 +39,14 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractTestDescripto
 	}
 
 	private ParametrizedBenchmarkMethodDescriptor(UniqueId uniqueId, BenchmarkMethod benchmarkMethod,
-			ParametrizedBenchmarkMethod parametrizedMethod) {
+												  ParametrizedBenchmarkMethod parametrizedMethod) {
 		super(uniqueId, generateDefaultDisplayName(benchmarkMethod.getMethod()),
 				MethodSource.from(benchmarkMethod.getDeclaringClass(), benchmarkMethod.getMethod()));
 		this.method = benchmarkMethod;
 		this.parametrizedMethod = parametrizedMethod;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.junit.platform.engine.TestDescriptor#getType()
 	 */
@@ -57,7 +55,7 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractTestDescripto
 		return Type.CONTAINER;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.junit.platform.engine.TestDescriptor#getLegacyReportingName()
 	 */
@@ -66,7 +64,7 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractTestDescripto
 		return generateDefaultDisplayName(method.getMethod());
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see jmh.mbr.core.model.MethodAware#getMethod()
 	 */
@@ -75,7 +73,7 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractTestDescripto
 		return method.getMethod();
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see jmh.mbr.core.model.MethodAware#isUnderlyingMethod(java.lang.reflect.Method)
 	 */
