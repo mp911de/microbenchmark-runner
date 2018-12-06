@@ -32,14 +32,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import jmh.mbr.core.Environment;
-import jmh.mbr.core.JmhSupport;
-import jmh.mbr.core.StringUtils;
-import jmh.mbr.core.model.BenchmarkClass;
-import jmh.mbr.core.model.MethodAware;
-import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
-import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
-import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -53,6 +45,15 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.format.OutputFormat;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
+
+import jmh.mbr.core.Environment;
+import jmh.mbr.core.JmhSupport;
+import jmh.mbr.core.StringUtils;
+import jmh.mbr.core.model.BenchmarkClass;
+import jmh.mbr.core.model.MethodAware;
+import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
+import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 
 /**
  * JMH Benchmark runner.
@@ -88,9 +89,11 @@ public class JmhRunner {
 
 		try {
 			listener.executionStarted(testDescriptor);
-			support.publishResults(new Runner(options, notifyingOutputFormat).run());
+			support.publishResults(notifyingOutputFormat,
+					new Runner(options, notifyingOutputFormat).run());
 			listener.executionFinished(testDescriptor, TestExecutionResult.successful());
-		} catch (RunnerException e) {
+		}
+		catch (RunnerException e) {
 			listener.executionFinished(testDescriptor, TestExecutionResult.failed(e));
 		}
 	}
@@ -174,7 +177,7 @@ public class JmhRunner {
 		private volatile boolean recordOutput;
 
 		NotifyingOutputFormat(EngineExecutionListener listener, CacheFunction methods,
-							  OutputFormat delegate) {
+				OutputFormat delegate) {
 			this.listener = listener;
 			this.descriptionResolver = methods;
 			this.delegate = delegate;
@@ -189,7 +192,7 @@ public class JmhRunner {
 		 */
 		@Override
 		public void iteration(BenchmarkParams benchParams, IterationParams params,
-							  int iteration) {
+				int iteration) {
 			delegate.iteration(benchParams, params, iteration);
 		}
 
@@ -203,7 +206,7 @@ public class JmhRunner {
 		 */
 		@Override
 		public void iterationResult(BenchmarkParams benchParams, IterationParams params,
-									int iteration, IterationResult data) {
+				int iteration, IterationResult data) {
 			delegate.iterationResult(benchParams, params, iteration, data);
 		}
 
@@ -254,7 +257,7 @@ public class JmhRunner {
 		}
 
 		private void notifyFinishedRecursively(TestDescriptor descriptor,
-											   Consumer<TestDescriptor> visitor) {
+				Consumer<TestDescriptor> visitor) {
 
 			Optional<TestDescriptor> parent = descriptor.getParent();
 
@@ -284,7 +287,7 @@ public class JmhRunner {
 		}
 
 		private TestExecutionResult getResult(BenchmarkResult result,
-											  BenchmarkParams lastKnownBenchmark) {
+				BenchmarkParams lastKnownBenchmark) {
 
 			if (result != null) {
 				return TestExecutionResult.successful();
@@ -301,7 +304,7 @@ public class JmhRunner {
 		}
 
 		private TestDescriptor getDescriptor(BenchmarkResult result,
-											 BenchmarkParams lastKnownBenchmark) {
+				BenchmarkParams lastKnownBenchmark) {
 
 			if (result != null) {
 				return descriptionResolver.apply(result.getParams());

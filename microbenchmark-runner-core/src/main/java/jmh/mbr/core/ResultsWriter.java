@@ -15,28 +15,31 @@
  */
 package jmh.mbr.core;
 
-import lombok.SneakyThrows;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.ServiceLoader;
 
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatFactory;
 import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.format.OutputFormat;
+
+import lombok.SneakyThrows;
 
 /**
  * @author Christoph Strobl
  */
-interface ResultsWriter {
+public interface ResultsWriter {
 
 	/**
 	 * Write the {@link RunResult}s.
+	 * @param output
 	 *
 	 * @param results can be {@literal null}.
 	 */
-	void write(Collection<RunResult> results);
+	void write(OutputFormat output, Collection<RunResult> results);
 
 	/**
 	 * Convert {@link RunResult}s to JMH Json representation.
@@ -49,8 +52,30 @@ interface ResultsWriter {
 	static String jsonifyResults(Collection<RunResult> results) {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ResultFormatFactory.getInstance(ResultFormatType.JSON, new PrintStream(baos, true, "UTF-8")).writeOut(results);
+		ResultFormatFactory
+				.getInstance(ResultFormatType.JSON, new PrintStream(baos, true, "UTF-8"))
+				.writeOut(results);
 
 		return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 	}
+
+	static ResultsWriter forUri(String uri) {
+		ServiceLoader<ResultsWriterFactory> loader = ServiceLoader
+				.load(ResultsWriterFactory.class);
+		for (ResultsWriterFactory factory : loader) {
+			ResultsWriter writer = factory.forUri(uri);
+			if (writer != null) {
+				return writer;
+			}
+		}
+		return new EmptyResultsWriter();
+	}
+}
+
+class EmptyResultsWriter implements ResultsWriter {
+
+	@Override
+	public void write(OutputFormat output, Collection<RunResult> results) {
+	}
+
 }
