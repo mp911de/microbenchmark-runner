@@ -30,4 +30,9 @@ class ResultsWriterFactoryTests {
 		assertThat(ResultsWriter.forUri("urn:empty")).isNotNull();
 	}
 
+	@Test
+	void empty() {
+		assertThat(ResultsWriter.forUri("file:./target")).isNull();
+	}
+
 }

@@ -18,7 +18,9 @@ package jmh.mbr.core;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import org.openjdk.jmh.results.RunResult;
@@ -62,20 +64,36 @@ public interface ResultsWriter {
 	static ResultsWriter forUri(String uri) {
 		ServiceLoader<ResultsWriterFactory> loader = ServiceLoader
 				.load(ResultsWriterFactory.class);
+		List<ResultsWriter> result = new ArrayList<>();
 		for (ResultsWriterFactory factory : loader) {
 			ResultsWriter writer = factory.forUri(uri);
 			if (writer != null) {
-				return writer;
+				result.add(writer);
 			}
 		}
-		return new EmptyResultsWriter();
+		return result.isEmpty() ? null : new CompositeResultsWriter(result);
 	}
 }
 
-class EmptyResultsWriter implements ResultsWriter {
+class CompositeResultsWriter implements ResultsWriter {
+
+	private List<ResultsWriter> writers = new ArrayList<>();
+
+	public CompositeResultsWriter(List<ResultsWriter> writers) {
+		this.writers = writers;
+	}
 
 	@Override
 	public void write(OutputFormat output, Collection<RunResult> results) {
+		for (ResultsWriter writer : writers) {
+			writer.write(output, results);
+		}
+	}
+
+	public void add(ResultsWriter writer) {
+		if (writer != null) {
+			this.writers.add(writer);
+		}
 	}
 
 }

@@ -28,7 +28,7 @@ public class TestResultsWriterFactory implements ResultsWriterFactory {
 
 	@Override
 	public ResultsWriter forUri(String uri) {
-		return new TestResultsWriter();
+		return uri.equals("urn:empty") ? new TestResultsWriter() : null;
 	}
 
 	class TestResultsWriter implements ResultsWriter {
