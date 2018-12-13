@@ -142,9 +142,8 @@ public class JmhSupport {
 	 * Returns the report file name for {@link Class class under benchmark}.
 	 *
 	 * @param jmhTestClass class under benchmark.
-	 * @return the report file name such as
-	 * {@code project.version_yyyy-MM-dd_ClassName.json} eg. *
-	 * {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
+	 * @return the report file name such as {@code project.version_yyyy-MM-dd_ClassName.json} eg. *
+	 *         {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
 	 */
 	public String reportFilename(Class<?> jmhTestClass) {
 
@@ -181,8 +180,7 @@ public class JmhSupport {
 		}
 
 		if (measurementTime > 0) {
-			optionsBuilder = optionsBuilder
-					.measurementTime(TimeValue.seconds(measurementTime));
+			optionsBuilder = optionsBuilder.measurementTime(TimeValue.seconds(measurementTime));
 		}
 
 		return optionsBuilder;
@@ -238,8 +236,7 @@ public class JmhSupport {
 	 * @throws IOException if report file cannot be created.
 	 * @see #getReportDirectory()
 	 */
-	private ChainedOptionsBuilder report(ChainedOptionsBuilder optionsBuilder,
-			Class<?> jmhTestClass) throws IOException {
+	private ChainedOptionsBuilder report(ChainedOptionsBuilder optionsBuilder, Class<?> jmhTestClass) throws IOException {
 
 		String reportDir = getReportDirectory();
 
@@ -247,15 +244,13 @@ public class JmhSupport {
 			return optionsBuilder;
 		}
 
-		String reportFilePath = reportDir
-				+ (reportDir.endsWith(File.separator) ? "" : File.separator)
+		String reportFilePath = reportDir + (reportDir.endsWith(File.separator) ? "" : File.separator)
 				+ reportFilename(jmhTestClass);
 		File file = getFile(reportFilePath);
 
 		if (file.exists()) {
 			file.delete();
-		}
-		else {
+		} else {
 
 			file.getParentFile().mkdirs();
 			file.createNewFile();
@@ -268,8 +263,7 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Resolve the given resource location to a {@code java.io.File}, i.e. to a file in
-	 * the file system.
+	 * Resolve the given resource location to a {@code java.io.File}, i.e. to a file in the file system.
 	 *
 	 * @param resourceLocation the resource location.
 	 * @return {@link File} for {@code resourceLocation}.
@@ -293,10 +287,8 @@ public class JmhSupport {
 
 		try {
 			ResultsWriter.forUri(uri).write(output, results);
-		}
-		catch (Exception e) {
-			System.err.println(String.format(
-					"Cannot save benchmark results to '%s'. Error was %s.", uri, e));
+		} catch (Exception e) {
+			System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
 		}
 
 	}
@@ -313,23 +305,18 @@ public class JmhSupport {
 		if (options.getOutput().hasValue()) {
 			try {
 				out = new PrintStream(options.getOutput().get());
-			}
-			catch (FileNotFoundException ex) {
+			} catch (FileNotFoundException ex) {
 				throw new IllegalStateException(ex);
 			}
-		}
-		else {
+		} else {
 			// Protect the System.out from accidental closing
 			try {
-				out = new UnCloseablePrintStream(System.out,
-						Utils.guessConsoleEncoding());
-			}
-			catch (UnsupportedEncodingException ex) {
+				out = new UnCloseablePrintStream(System.out, Utils.guessConsoleEncoding());
+			} catch (UnsupportedEncodingException ex) {
 				throw new IllegalStateException(ex);
 			}
 		}
 
-		return OutputFormatFactory.createFormatInstance(out,
-				options.verbosity().orElse(Defaults.VERBOSITY));
+		return OutputFormatFactory.createFormatInstance(out, options.verbosity().orElse(Defaults.VERBOSITY));
 	}
 }

@@ -37,8 +37,8 @@ public interface ResultsWriter {
 
 	/**
 	 * Write the {@link RunResult}s.
+	 * 
 	 * @param output
-	 *
 	 * @param results can be {@literal null}.
 	 */
 	void write(OutputFormat output, Collection<RunResult> results);
@@ -54,16 +54,13 @@ public interface ResultsWriter {
 	static String jsonifyResults(Collection<RunResult> results) {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ResultFormatFactory
-				.getInstance(ResultFormatType.JSON, new PrintStream(baos, true, "UTF-8"))
-				.writeOut(results);
+		ResultFormatFactory.getInstance(ResultFormatType.JSON, new PrintStream(baos, true, "UTF-8")).writeOut(results);
 
 		return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 	}
 
 	static ResultsWriter forUri(String uri) {
-		ServiceLoader<ResultsWriterFactory> loader = ServiceLoader
-				.load(ResultsWriterFactory.class);
+		ServiceLoader<ResultsWriterFactory> loader = ServiceLoader.load(ResultsWriterFactory.class);
 		List<ResultsWriter> result = new ArrayList<>();
 		for (ResultsWriterFactory factory : loader) {
 			ResultsWriter writer = factory.forUri(uri);
