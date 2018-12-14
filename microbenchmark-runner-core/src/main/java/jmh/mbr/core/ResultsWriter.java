@@ -15,28 +15,33 @@
  */
 package jmh.mbr.core;
 
-import lombok.SneakyThrows;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.ServiceLoader;
 
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatFactory;
 import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.format.OutputFormat;
+
+import lombok.SneakyThrows;
 
 /**
  * @author Christoph Strobl
  */
-interface ResultsWriter {
+public interface ResultsWriter {
 
 	/**
 	 * Write the {@link RunResult}s.
-	 *
+	 * 
+	 * @param output
 	 * @param results can be {@literal null}.
 	 */
-	void write(Collection<RunResult> results);
+	void write(OutputFormat output, Collection<RunResult> results);
 
 	/**
 	 * Convert {@link RunResult}s to JMH Json representation.
@@ -53,4 +58,39 @@ interface ResultsWriter {
 
 		return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 	}
+
+	static ResultsWriter forUri(String uri) {
+		ServiceLoader<ResultsWriterFactory> loader = ServiceLoader.load(ResultsWriterFactory.class);
+		List<ResultsWriter> result = new ArrayList<>();
+		for (ResultsWriterFactory factory : loader) {
+			ResultsWriter writer = factory.forUri(uri);
+			if (writer != null) {
+				result.add(writer);
+			}
+		}
+		return result.isEmpty() ? null : new CompositeResultsWriter(result);
+	}
+}
+
+class CompositeResultsWriter implements ResultsWriter {
+
+	private List<ResultsWriter> writers = new ArrayList<>();
+
+	public CompositeResultsWriter(List<ResultsWriter> writers) {
+		this.writers = writers;
+	}
+
+	@Override
+	public void write(OutputFormat output, Collection<RunResult> results) {
+		for (ResultsWriter writer : writers) {
+			writer.write(output, results);
+		}
+	}
+
+	public void add(ResultsWriter writer) {
+		if (writer != null) {
+			this.writers.add(writer);
+		}
+	}
+
 }

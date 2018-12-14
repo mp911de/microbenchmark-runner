@@ -277,19 +277,19 @@ public class JmhSupport {
 	 *
 	 * @param results must not be {@literal null}.
 	 */
-	public void publishResults(Collection<RunResult> results) {
+	public void publishResults(OutputFormat output, Collection<RunResult> results) {
 
 		if (results.isEmpty() || !Environment.containsProperty("publishTo")) {
 			return;
 		}
 
 		String uri = Environment.getProperty("publishTo");
-		// TODO: Registry?
-		/*
-		 * try { ResultsWriter.forUri(uri).write(results); } catch (Exception e) {
-		 * System.err.println(String.
-		 * format("Cannot save benchmark results to '%s'. Error was %s.", uri, e)); }
-		 */
+
+		try {
+			ResultsWriter.forUri(uri).write(output, results);
+		} catch (Exception e) {
+			System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
+		}
 
 	}
 

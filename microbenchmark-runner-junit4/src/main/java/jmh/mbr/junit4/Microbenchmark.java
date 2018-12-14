@@ -37,15 +37,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import jmh.mbr.core.Environment;
-import jmh.mbr.core.JmhSupport;
-import jmh.mbr.core.StringUtils;
-import jmh.mbr.core.model.BenchmarkClass;
-import jmh.mbr.core.model.BenchmarkDescriptor;
-import jmh.mbr.core.model.BenchmarkDescriptorFactory;
-import jmh.mbr.core.model.BenchmarkFixture;
-import jmh.mbr.core.model.BenchmarkMethod;
-import jmh.mbr.core.model.HierarchicalBenchmarkDescriptor;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
@@ -73,15 +64,24 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.util.UnCloseablePrintStream;
 import org.openjdk.jmh.util.Utils;
 
+import jmh.mbr.core.Environment;
+import jmh.mbr.core.JmhSupport;
+import jmh.mbr.core.StringUtils;
+import jmh.mbr.core.model.BenchmarkClass;
+import jmh.mbr.core.model.BenchmarkDescriptor;
+import jmh.mbr.core.model.BenchmarkDescriptorFactory;
+import jmh.mbr.core.model.BenchmarkFixture;
+import jmh.mbr.core.model.BenchmarkMethod;
+import jmh.mbr.core.model.HierarchicalBenchmarkDescriptor;
+
 /**
- * JMH Microbenchmark runner that turns methods annotated with {@link Benchmark} into
- * runnable methods allowing execution through JUnit.
+ * JMH Microbenchmark runner that turns methods annotated with {@link Benchmark} into runnable methods allowing
+ * execution through JUnit.
  *
  * @author Mark Paluch
  * @author Dave Syer
  */
-public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
-		implements Filterable, Sortable {
+public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements Filterable, Sortable {
 
 	private final List<? extends BenchmarkDescriptor> children;
 	private final Map<BenchmarkDescriptor, Description> descriptions = new ConcurrentHashMap<>();
@@ -103,8 +103,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 	public Microbenchmark(Class<?> testClass) throws InitializationError {
 
 		super(testClass);
-		this.benchmarkClass = BenchmarkDescriptorFactory.create(testClass)
-				.createDescriptor();
+		this.benchmarkClass = BenchmarkDescriptorFactory.create(testClass).createDescriptor();
 		this.children = benchmarkClass.getChildren();
 
 		for (BenchmarkDescriptor child : children) {
@@ -116,8 +115,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 
 					BenchmarkFixture fixture = (BenchmarkFixture) nested;
 
-					parametrizedDescriptions.computeIfAbsent(fixture.getDisplayName(),
-							it -> new ArrayList<>()).add(descriptor);
+					parametrizedDescriptions.computeIfAbsent(fixture.getDisplayName(), it -> new ArrayList<>()).add(descriptor);
 				}
 			}
 		}
@@ -129,8 +127,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 	 * @param errors
 	 */
 	@Override
-	protected void collectInitializationErrors(List<Throwable> errors) {
-	}
+	protected void collectInitializationErrors(List<Throwable> errors) {}
 
 	@Override
 	protected List<BenchmarkDescriptor> getChildren() {
@@ -177,8 +174,8 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		if (child instanceof BenchmarkClass) {
 
 			BenchmarkClass benchmarkClass = (BenchmarkClass) child;
-			Description description = Description.createSuiteDescription(getName(),
-					UUID.randomUUID(), getRunnerAnnotations());
+			Description description = Description.createSuiteDescription(getName(), UUID.randomUUID(),
+					getRunnerAnnotations());
 
 			for (BenchmarkDescriptor childDescriptor : benchmarkClass.getChildren()) {
 
@@ -187,8 +184,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 				}
 			}
 
-			for (Entry<String, List<BenchmarkDescriptor>> entry : parametrizedDescriptions
-					.entrySet()) {
+			for (Entry<String, List<BenchmarkDescriptor>> entry : parametrizedDescriptions.entrySet()) {
 
 				Description fixture = Description.createSuiteDescription(entry.getKey());
 
@@ -196,9 +192,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 
 					BenchmarkMethod benchmarkMethod = getBenchmarkMethod(nested);
 					Description nestedDescription = createDescription(benchmarkMethod);
-					fixtureMethodDescriptions.put(
-							entry.getKey() + "-" + nestedDescription.getMethodName(),
-							nestedDescription);
+					fixtureMethodDescriptions.put(entry.getKey() + "-" + nestedDescription.getMethodName(), nestedDescription);
 
 					fixture.addChild(nestedDescription);
 				}
@@ -212,8 +206,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		if (child instanceof BenchmarkMethod) {
 
 			BenchmarkMethod method = (BenchmarkMethod) child;
-			return Description.createTestDescription(method.getDeclaringClass().getName(),
-					method.getName());
+			return Description.createTestDescription(method.getDeclaringClass().getName(), method.getName());
 		}
 
 		if (child instanceof HierarchicalBenchmarkDescriptor) {
@@ -223,8 +216,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 			if (hierarchical.getDescriptor() instanceof BenchmarkMethod) {
 
 				BenchmarkMethod method = (BenchmarkMethod) hierarchical.getDescriptor();
-				description = Description.createTestDescription(
-						method.getDeclaringClass().getName(), method.getName());
+				description = Description.createTestDescription(method.getDeclaringClass().getName(), method.getName());
 			}
 
 			for (BenchmarkDescriptor childDescriptor : hierarchical.getChildren()) {
@@ -235,8 +227,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		}
 
 		if (child instanceof BenchmarkFixture) {
-			return Description
-					.createSuiteDescription(((BenchmarkFixture) child).getDisplayName());
+			return Description.createSuiteDescription(((BenchmarkFixture) child).getDisplayName());
 		}
 
 		throw new IllegalArgumentException("Cannot describe" + child);
@@ -286,19 +277,16 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 
 			getFilteredChildren().forEach(sorter::apply);
 
-			List<BenchmarkDescriptor> sortedChildren = new ArrayList<>(
-					getFilteredChildren());
+			List<BenchmarkDescriptor> sortedChildren = new ArrayList<>(getFilteredChildren());
 
-			sortedChildren.sort(
-					(o1, o2) -> sorter.compare(describeChild(o1), describeChild(o2)));
+			sortedChildren.sort((o1, o2) -> sorter.compare(describeChild(o1), describeChild(o2)));
 
 			filteredChildren = sortedChildren;
 		}
 	}
 
 	@Override
-	protected void runChild(BenchmarkDescriptor child, RunNotifier notifier) {
-	}
+	protected void runChild(BenchmarkDescriptor child, RunNotifier notifier) {}
 
 	/**
 	 * Run matching {@link org.openjdk.jmh.annotations.Benchmark} methods.
@@ -307,18 +295,15 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 	protected Statement childrenInvoker(RunNotifier notifier) {
 
 		Collection<BenchmarkDescriptor> methods = getFilteredChildren();
-		CacheFunction cache = new CacheFunction(methods, this::describeChild,
-				(method, fixture) -> {
+		CacheFunction cache = new CacheFunction(methods, this::describeChild, (method, fixture) -> {
 
-					return fixtureMethodDescriptions
-							.get(fixture.getDisplayName() + "-" + method.getName());
-				});
+			return fixtureMethodDescriptions.get(fixture.getDisplayName() + "-" + method.getName());
+		});
 
 		if (methods.isEmpty()) {
 			return new Statement() {
 				@Override
-				public void evaluate() {
-				}
+				public void evaluate() {}
 			};
 		}
 
@@ -335,8 +320,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		};
 	}
 
-	void doRun(RunNotifier notifier, Collection<BenchmarkDescriptor> methods,
-			   CacheFunction cache) throws Exception {
+	void doRun(RunNotifier notifier, Collection<BenchmarkDescriptor> methods, CacheFunction cache) throws Exception {
 
 		Class<?> jmhTestClass = getTestClass().getJavaClass();
 		List<String> includes = includes(jmhTestClass, methods);
@@ -355,37 +339,34 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		includes.forEach(optionsBuilder::include);
 
 		Options options = optionsBuilder.build();
-		NotifyingOutputFormat notifyingOutputFormat = new NotifyingOutputFormat(notifier,
-				cache, createOutputFormat(options));
+		NotifyingOutputFormat notifyingOutputFormat = new NotifyingOutputFormat(notifier, cache,
+				createOutputFormat(options));
 
-		jmhRunner.publishResults(new Runner(options, notifyingOutputFormat).run());
+		jmhRunner.publishResults(notifyingOutputFormat, new Runner(options, notifyingOutputFormat).run());
 	}
 
 	/**
-	 * Get the regex for all benchmarks to be included in the run. By default every
-	 * benchmark within classes matching the fqcn. <br />
-	 * The {@literal benchmark} command line argument allows overriding the defaults using
-	 * {@code #} as class / method name separator.
+	 * Get the regex for all benchmarks to be included in the run. By default every benchmark within classes matching the
+	 * fqcn. <br />
+	 * The {@literal benchmark} command line argument allows overriding the defaults using {@code #} as class / method
+	 * name separator.
 	 *
 	 * @param name
 	 * @param methods
 	 * @return never {@literal null}.
 	 */
-	private List<String> includes(Class<?> testClass,
-								  Collection<BenchmarkDescriptor> methods) {
+	private List<String> includes(Class<?> testClass, Collection<BenchmarkDescriptor> methods) {
 
 		String tests = Environment.getProperty("benchmark");
 
 		if (!StringUtils.hasText(tests)) {
 
 			return methods.stream().map(Microbenchmark::getBenchmarkMethod)
-					.map(it -> Pattern.quote(it.getDeclaringClass().getName()) + "\\."
-							+ Pattern.quote(it.getName()) + "$")
+					.map(it -> Pattern.quote(it.getDeclaringClass().getName()) + "\\." + Pattern.quote(it.getName()) + "$")
 					.collect(Collectors.toList());
 		}
 
-		if (tests.contains(testClass.getName())
-				|| tests.contains(testClass.getSimpleName())) {
+		if (tests.contains(testClass.getName()) || tests.contains(testClass.getSimpleName())) {
 			if (!tests.contains("#")) {
 				return Collections.singletonList(".*" + tests + ".*");
 			}
@@ -427,15 +408,13 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		} else {
 			// Protect the System.out from accidental closing
 			try {
-				out = new UnCloseablePrintStream(System.out,
-						Utils.guessConsoleEncoding());
+				out = new UnCloseablePrintStream(System.out, Utils.guessConsoleEncoding());
 			} catch (UnsupportedEncodingException ex) {
 				throw new IllegalStateException(ex);
 			}
 		}
 
-		return OutputFormatFactory.createFormatInstance(out,
-				options.verbosity().orElse(Defaults.VERBOSITY));
+		return OutputFormatFactory.createFormatInstance(out, options.verbosity().orElse(Defaults.VERBOSITY));
 	}
 
 	private static String getBenchmarkName(BenchmarkDescriptor descriptor) {
@@ -459,13 +438,12 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 			}
 		}
 
-		throw new IllegalStateException(
-				"Cannot obtain BenchmarkMethod from" + descriptor);
+		throw new IllegalStateException("Cannot obtain BenchmarkMethod from" + descriptor);
 	}
 
 	/**
-	 * {@link OutputFormat} that delegates to another {@link OutputFormat} and notifies
-	 * {@link RunNotifier} about the progress.
+	 * {@link OutputFormat} that delegates to another {@link OutputFormat} and notifies {@link RunNotifier} about the
+	 * progress.
 	 */
 	static class NotifyingOutputFormat implements OutputFormat {
 
@@ -477,8 +455,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		private volatile BenchmarkParams lastKnownBenchmark;
 		private volatile boolean recordOutput;
 
-		NotifyingOutputFormat(RunNotifier notifier, CacheFunction methods,
-							  OutputFormat delegate) {
+		NotifyingOutputFormat(RunNotifier notifier, CacheFunction methods, OutputFormat delegate) {
 			this.notifier = notifier;
 			this.descriptionResolver = methods;
 			this.delegate = delegate;
@@ -492,8 +469,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		 * BenchmarkParams, org.openjdk.jmh.infra.IterationParams, int)
 		 */
 		@Override
-		public void iteration(BenchmarkParams benchParams, IterationParams params,
-							  int iteration) {
+		public void iteration(BenchmarkParams benchParams, IterationParams params, int iteration) {
 			delegate.iteration(benchParams, params, iteration);
 		}
 
@@ -506,8 +482,8 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		 * org.openjdk.jmh.results.IterationResult)
 		 */
 		@Override
-		public void iterationResult(BenchmarkParams benchParams, IterationParams params,
-									int iteration, IterationResult data) {
+		public void iterationResult(BenchmarkParams benchParams, IterationParams params, int iteration,
+				IterationResult data) {
 			delegate.iterationResult(benchParams, params, iteration, data);
 		}
 
@@ -546,11 +522,9 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 				notifier.fireTestFinished(descriptionResolver.apply(result.getParams()));
 			} else if (lastKnownBenchmark != null) {
 
-				String output = StringUtils.collectionToDelimitedString(log,
-						System.getProperty("line.separator"));
+				String output = StringUtils.collectionToDelimitedString(log, System.getProperty("line.separator"));
 				notifier.fireTestFailure(
-						new Failure(descriptionResolver.apply(lastKnownBenchmark),
-								new JmhRunnerException(output)));
+						new Failure(descriptionResolver.apply(lastKnownBenchmark), new JmhRunnerException(output)));
 			}
 
 			log.clear();
@@ -690,9 +664,8 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 		private final Function<BenchmarkDescriptor, Description> describeFunction;
 		private final BiFunction<BenchmarkMethod, BenchmarkFixture, Description> describeParametrizedMethodFunction;
 
-		CacheFunction(Collection<BenchmarkDescriptor> methods,
-					  Function<BenchmarkDescriptor, Description> describeFunction,
-					  BiFunction<BenchmarkMethod, BenchmarkFixture, Description> describeParametrizedMethodFunction) {
+		CacheFunction(Collection<BenchmarkDescriptor> methods, Function<BenchmarkDescriptor, Description> describeFunction,
+				BiFunction<BenchmarkMethod, BenchmarkFixture, Description> describeParametrizedMethodFunction) {
 			this.methods = methods;
 			this.describeFunction = describeFunction;
 			this.describeParametrizedMethodFunction = describeParametrizedMethodFunction;
@@ -716,15 +689,13 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 					lookup.put(key, benchmark.getParam(key));
 				}
 
-				for (BenchmarkDescriptor child : ((HierarchicalBenchmarkDescriptor) descriptor)
-						.getChildren()) {
+				for (BenchmarkDescriptor child : ((HierarchicalBenchmarkDescriptor) descriptor).getChildren()) {
 
 					if (child instanceof BenchmarkFixture) {
 						BenchmarkFixture fixture = (BenchmarkFixture) child;
 
 						if (fixture.getFixture().equals(lookup)) {
-							return describeParametrizedMethodFunction
-									.apply(getBenchmarkMethod(descriptor), fixture);
+							return describeParametrizedMethodFunction.apply(getBenchmarkMethod(descriptor), fixture);
 						}
 					}
 				}
@@ -741,12 +712,11 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor>
 
 			return methodMap.computeIfAbsent(benchmark.getBenchmark(), key -> {
 
-				Optional<BenchmarkDescriptor> method = methods.stream()
-						.filter(it -> getBenchmarkName(it).equals(key)).findFirst();
+				Optional<BenchmarkDescriptor> method = methods.stream().filter(it -> getBenchmarkName(it).equals(key))
+						.findFirst();
 
 				return method.orElseThrow(() -> new IllegalArgumentException(
-						String.format("Cannot resolve %s to a BenchmarkDescriptor!",
-								benchmark.getBenchmark())));
+						String.format("Cannot resolve %s to a BenchmarkDescriptor!", benchmark.getBenchmark())));
 			});
 		}
 	}
