@@ -59,30 +59,30 @@ The easiest way is to use [jitpack.io](https://jitpack.io/#mp911de/microbenchmar
 Add the following repository to your `pom.xml` (when using Maven):
 
 ```xml
-	<repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
 
 and one of the dependencies:
 
 ```xml
-	<dependency>
-	    <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-	    <artifactId>microbenchmark-runner-junit4</artifactId>
-	    <version>master</version>
-	</dependency>
+<dependency>
+    <groupId>com.github.mp911de.microbenchmark-runner</groupId>
+    <artifactId>microbenchmark-runner-junit4</artifactId>
+    <version>master</version>
+</dependency>
 ```
 
 ```xml
-	<dependency>
-	    <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-	    <artifactId>microbenchmark-runner-junit5</artifactId>
-	    <version>master</version>
-	</dependency>
+<dependency>
+    <groupId>com.github.mp911de.microbenchmark-runner</groupId>
+    <artifactId>microbenchmark-runner-junit5</artifactId>
+    <version>master</version>
+</dependency>
 ```
 
 # Configuration
