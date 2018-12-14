@@ -99,7 +99,6 @@ public class JmhSupport {
 	 */
 	public int getMeasurementIterations() {
 		return Integer.parseInt(Environment.getProperty("measurementIterations", "-1"));
-
 	}
 
 	/**
@@ -143,7 +142,7 @@ public class JmhSupport {
 	 *
 	 * @param jmhTestClass class under benchmark.
 	 * @return the report file name such as {@code project.version_yyyy-MM-dd_ClassName.json} eg. *
-	 *         {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
+	 * {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
 	 */
 	public String reportFilename(Class<?> jmhTestClass) {
 
@@ -246,7 +245,7 @@ public class JmhSupport {
 
 		String reportFilePath = reportDir + (reportDir.endsWith(File.separator) ? "" : File.separator)
 				+ reportFilename(jmhTestClass);
-		File file = getFile(reportFilePath);
+		File file = new File(reportFilePath);
 
 		if (file.exists()) {
 			file.delete();
@@ -290,7 +289,6 @@ public class JmhSupport {
 		} catch (Exception e) {
 			System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
 		}
-
 	}
 
 	public OutputFormat createOutputFormat(Options options) {
