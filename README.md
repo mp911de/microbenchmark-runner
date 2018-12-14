@@ -73,7 +73,7 @@ and one of the dependencies:
 <dependency>
     <groupId>com.github.mp911de.microbenchmark-runner</groupId>
     <artifactId>microbenchmark-runner-junit4</artifactId>
-    <version>master</version>
+    <version>${version}.RELEASE</version>
 </dependency>
 ```
 
@@ -81,7 +81,7 @@ and one of the dependencies:
 <dependency>
     <groupId>com.github.mp911de.microbenchmark-runner</groupId>
     <artifactId>microbenchmark-runner-junit5</artifactId>
-    <version>master</version>
+    <version>${version}.RELEASE</version>
 </dependency>
 ```
 
@@ -90,6 +90,7 @@ and one of the dependencies:
 You can configure the runner by using System Properties and Environment Variables to control behavior of the following parameters:
 
 * `benchmarksEnabled` (`boolean`, defaults to `true`) Controls whether benchmarks should be executed. Setting `benchmarksEnabled=false` can be useful for conditional execution of benchmarks.
+* `benchmarkReportDir` (`File`, defaults to `none`) Writes JMH benchmark results to this directory.
 * `warmupIterations` (`integer`, defaults to `-1`) Global override of warmup iterations. Uses `@Warmup` or JMH defaults if set to `-1`
 * `warmupTime` (`integer`, defaults to `-1`) Global override of warmup time. Uses `@Warmup` or JMH defaults if set to `-1`. 
 * `measurementIterations` (`integer`, defaults to `-1`) Global override of measurement iterations. Uses `@Measurement` or JMH defaults if set to `-1`. 
