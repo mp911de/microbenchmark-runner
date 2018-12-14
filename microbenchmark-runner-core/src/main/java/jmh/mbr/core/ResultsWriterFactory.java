@@ -16,9 +16,20 @@
 package jmh.mbr.core;
 
 /**
- * @author Christoph Strobl
+ * SPI for {@link ResultsWriter} plugins. Uses an opaque {@code uri} to specify the desired target where results can be written to.
+ *
+ * @author Dave Syer
+ * @author Mark Paluch
+ * @see java.util.ServiceLoader
  */
 public interface ResultsWriterFactory {
 
+	/**
+	 * Creates a new {@link ResultsWriter} for {@code uri}.
+	 * Implementations may return {@literal null} if the {@code uri} is not supported.
+	 *
+	 * @param uri target location to which results are written to.
+	 * @return the {@link ResultsWriter} implementation or {@literal null} if the {@code uri} is not supported.
+	 */
 	ResultsWriter forUri(String uri);
 }

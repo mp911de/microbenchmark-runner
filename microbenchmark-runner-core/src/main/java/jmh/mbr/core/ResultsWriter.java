@@ -23,22 +23,25 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import lombok.SneakyThrows;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatFactory;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.format.OutputFormat;
 
-import lombok.SneakyThrows;
-
 /**
+ * Writes JMH results to an external target. This can be targets such as files, HTTP endpoints, or databases. {@link ResultsWriter} can be contributed through Java's {@link ServiceLoader} plugin mechanism.
+ *
  * @author Christoph Strobl
+ * @author Dave Syer
+ * @see ResultsWriterFactory
  */
 public interface ResultsWriter {
 
 	/**
 	 * Write the {@link RunResult}s.
-	 * 
-	 * @param output
+	 *
+	 * @param output original {@link OutputFormat} to append further details or failures that occurred while writing results.
 	 * @param results can be {@literal null}.
 	 */
 	void write(OutputFormat output, Collection<RunResult> results);
@@ -59,8 +62,16 @@ public interface ResultsWriter {
 		return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 	}
 
+	/**
+	 * Creates a {@link ResultsWriter} given a {@code uri}. This method considers {@link ResultsWriter} plugins provided by {@link ResultsWriterFactory} via Java's {@link ServiceLoader} mechanism. Returns {@literal null} if no applicable {@link ResultsWriter} was found.
+	 *
+	 * @param uri
+	 * @return the {@link ResultsWriter} or {@literal null} if none was found or none was applicable to {@code uri}.
+	 */
 	static ResultsWriter forUri(String uri) {
+
 		ServiceLoader<ResultsWriterFactory> loader = ServiceLoader.load(ResultsWriterFactory.class);
+
 		List<ResultsWriter> result = new ArrayList<>();
 		for (ResultsWriterFactory factory : loader) {
 			ResultsWriter writer = factory.forUri(uri);
@@ -68,15 +79,19 @@ public interface ResultsWriter {
 				result.add(writer);
 			}
 		}
+
 		return result.isEmpty() ? null : new CompositeResultsWriter(result);
 	}
 }
 
+/**
+ * Composite {@link ResultsWriter}.
+ */
 class CompositeResultsWriter implements ResultsWriter {
 
-	private List<ResultsWriter> writers = new ArrayList<>();
+	private final List<ResultsWriter> writers;
 
-	public CompositeResultsWriter(List<ResultsWriter> writers) {
+	CompositeResultsWriter(List<ResultsWriter> writers) {
 		this.writers = writers;
 	}
 
@@ -92,5 +107,4 @@ class CompositeResultsWriter implements ResultsWriter {
 			this.writers.add(writer);
 		}
 	}
-
 }
