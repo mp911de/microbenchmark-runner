@@ -13,7 +13,6 @@ During development time, we want quick turnaround times and an IDE that makes it
 
 **:warning: Do not use this launcher to run your benchmarks during CI or for actual measurements. Use it during development only. There are too many things that can blur actual results.** 
 
-
 Here is a quick teaser of a what Microbenchmark Runner can do for you:
 
 ### JUnit 4.x
@@ -36,7 +35,7 @@ public class SimpleBenchmark {
 
 Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. 
 
-### JUnit Jupiter Platform
+### JUnit 5.3.x
 
 ```java
 @Microbenchmark
