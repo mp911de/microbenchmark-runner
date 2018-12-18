@@ -1,17 +1,11 @@
 /*
  * Copyright 2018 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v2.0 which
+ * accompanies this distribution and is available at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.eclipse.org/legal/epl-v20.html
  */
 package jmh.mbr.core;
 
@@ -20,50 +14,35 @@ import java.util.Iterator;
 
 /**
  * Miscellaneous {@link String} utility methods.
- * <p>
- * Mainly for internal use within the framework
- *
- * @author Mark Paluch
  */
 public class StringUtils {
 
-	// ---------------------------------------------------------------------
-	// General convenience methods for working with Strings
-	// ---------------------------------------------------------------------
-
 	/**
-	 * Check whether the given {@code String} is empty.
-	 * <p>
-	 * This method accepts any Object as an argument, comparing it to {@code null} and the empty String. As a consequence,
-	 * this method will never return {@code true} for a non-null non-String object.
-	 * <p>
-	 * The Object signature is useful for general attribute handling code that commonly deals with Strings but generally
-	 * has to iterate over Objects since attributes may e.g. be primitive value objects as well.
+	 * Check whether the given {@link String} is empty.
 	 *
-	 * @param str the candidate String
+	 * @param theString the candidate String
 	 * @return {@literal true} if the string is empty.
 	 */
-	public static boolean isEmpty(Object str) {
-		return (str == null || "".equals(str));
+	public static boolean isEmpty(Object theString) {
+		return (theString == null || "".equals(theString));
 	}
 
 	/**
-	 * Check whether the given {@code String} contains actual <em>text</em>.
-	 * <p>
-	 * More specifically, this method returns {@code true} if the {@code String} is not {@code null}, its length is
-	 * greater than 0, and it contains at least one non-whitespace character.
+	 * Check whether the given {@link String} contains actual text.
 	 *
-	 * @param str the {@code String} to check (may be {@code null})
-	 * @return {@code true} if the {@code String} is not {@code null}, its length is greater than 0, and it does not
-	 *         contain whitespace only
+	 * @param theString the {@link String} to check (may be {@code null})
+	 * @return {@code true} if the {@link String} is not {@code null}, its length is greater than 0, and it does not
+	 * contain whitespace only
 	 */
-	public static boolean hasText(String str) {
-		return (str != null && !str.isEmpty() && containsText(str));
+	public static boolean hasText(String theString) {
+		return (theString != null && !theString.isEmpty() && containsText(theString));
 	}
 
 	private static boolean containsText(CharSequence str) {
-		int strLen = str.length();
-		for (int i = 0; i < strLen; i++) {
+
+		int length = str.length();
+
+		for (int i = 0; i < length; i++) {
 			if (!Character.isWhitespace(str.charAt(i))) {
 				return true;
 			}
@@ -72,51 +51,24 @@ public class StringUtils {
 	}
 
 	/**
-	 * Convert a {@code Collection} into a delimited {@code String} (e.g. CSV).
+	 * Convert a {@link Collection} into a delimited {@link String} (e.g. CSV).
 	 * <p>
-	 * Useful for {@code toString()} implementations.
+	 * Useful for {@link #toString()} implementations.
 	 *
-	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
+	 * @param c the {@code Collection} to convert (potentially {@code null} or empty).
 	 * @param delim the delimiter to use (typically a ",")
-	 * @return the delimited {@code String}
+	 * @return the delimited {@link String}
 	 */
-	public static String collectionToDelimitedString(Collection<?> coll, String delim) {
-		return collectionToDelimitedString(coll, delim, "", "");
-	}
+	public static String collectionToDelimitedString(Collection<?> c, String delim) {
 
-	/**
-	 * Convert a {@code Collection} into a delimited {@code String} (e.g., CSV).
-	 * <p>
-	 * Useful for {@code toString()} implementations.
-	 *
-	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
-	 * @return the delimited {@code String}
-	 */
-	public static String collectionToCommaDelimitedString(Collection<?> coll) {
-		return collectionToDelimitedString(coll, ",");
-	}
-
-	/**
-	 * Convert a {@link Collection} to a delimited {@code String} (e.g. CSV).
-	 * <p>
-	 * Useful for {@code toString()} implementations.
-	 *
-	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
-	 * @param delim the delimiter to use (typically a ",")
-	 * @param prefix the {@code String} to start each element with
-	 * @param suffix the {@code String} to end each element with
-	 * @return the delimited {@code String}
-	 */
-	public static String collectionToDelimitedString(Collection<?> coll, String delim, String prefix, String suffix) {
-
-		if (coll.isEmpty()) {
+		if (c.isEmpty()) {
 			return "";
 		}
 
 		StringBuilder sb = new StringBuilder();
-		Iterator<?> it = coll.iterator();
+		Iterator<?> it = c.iterator();
 		while (it.hasNext()) {
-			sb.append(prefix).append(it.next()).append(suffix);
+			sb.append(it.next());
 			if (it.hasNext()) {
 				sb.append(delim);
 			}

@@ -1,17 +1,11 @@
 /*
  * Copyright 2018 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v2.0 which
+ * accompanies this distribution and is available at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.eclipse.org/legal/epl-v20.html
  */
 package jmh.mbr.core.model;
 
@@ -23,8 +17,6 @@ import java.util.Objects;
 
 /**
  * {@link BenchmarkDescriptor} for a {@link org.openjdk.jmh.annotations.Benchmark} {@link Method}.
- *
- * @author Mark Paluch
  */
 public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 
@@ -42,19 +34,11 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		this.method = method;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see jmh.mbr.core.model.MethodAware#getMethod()
-	 */
 	@Override
 	public Method getMethod() {
 		return method;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see jmh.mbr.core.model.MethodAware#isUnderlyingMethod(java.lang.reflect.Method)
-	 */
 	@Override
 	public boolean isUnderlyingMethod(Method method) {
 		return this.method.equals(method);
@@ -95,10 +79,6 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		return method.getDeclaringClass();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!BenchmarkMethod.class.isInstance(obj)) {
@@ -107,10 +87,6 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		return ((BenchmarkMethod) obj).method.equals(method);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return method.hashCode();
@@ -134,10 +110,6 @@ public class BenchmarkMethod implements BenchmarkDescriptor, MethodAware {
 		return method.getAnnotation(annotationType);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return method.toString();

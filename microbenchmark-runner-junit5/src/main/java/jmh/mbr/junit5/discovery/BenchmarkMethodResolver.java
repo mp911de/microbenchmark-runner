@@ -1,17 +1,11 @@
 /*
  * Copyright 2018 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v2.0 which
+ * accompanies this distribution and is available at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.eclipse.org/legal/epl-v20.html
  */
 package jmh.mbr.junit5.discovery;
 
@@ -36,17 +30,11 @@ import org.junit.platform.engine.UniqueId.Segment;
 
 /**
  * {@link ElementResolver} for {@code Benchmark} {@link Method methods}.
- * 
- * @author Mark Paluch
  */
 class BenchmarkMethodResolver implements ElementResolver {
 
 	private static final String SEGMENT_TYPE = "method";
 
-	/* 
-	 * (non-Javadoc)
-	 * @see jmh.mbr.junit5.discovery.ElementResolver#resolveElement(java.lang.reflect.AnnotatedElement, org.junit.platform.engine.TestDescriptor)
-	 */
 	@Override
 	public Set<TestDescriptor> resolveElement(AnnotatedElement element, TestDescriptor parent) {
 
@@ -69,10 +57,6 @@ class BenchmarkMethodResolver implements ElementResolver {
 				.orElseGet(Collections::emptySet);
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see jmh.mbr.junit5.discovery.ElementResolver#resolveUniqueId(org.junit.platform.engine.UniqueId.Segment, org.junit.platform.engine.TestDescriptor)
-	 */
 	@Override
 	public Optional<TestDescriptor> resolveUniqueId(Segment segment, TestDescriptor parent) {
 

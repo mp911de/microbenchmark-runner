@@ -1,17 +1,11 @@
 /*
  * Copyright 2018 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v2.0 which
+ * accompanies this distribution and is available at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.eclipse.org/legal/epl-v20.html
  */
 package jmh.mbr.junit4;
 
@@ -77,9 +71,6 @@ import jmh.mbr.core.model.HierarchicalBenchmarkDescriptor;
 /**
  * JMH Microbenchmark runner that turns methods annotated with {@link Benchmark} into runnable methods allowing
  * execution through JUnit.
- *
- * @author Mark Paluch
- * @author Dave Syer
  */
 public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements Filterable, Sortable {
 
@@ -134,22 +125,11 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 		return (List) children;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.junit.runners.ParentRunner#classBlock(org.junit.runner.notification.
-	 * RunNotifier)
-	 */
 	@Override
 	protected Statement classBlock(RunNotifier notifier) {
 		return childrenInvoker(notifier);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.junit.runners.ParentRunner#getDescription()
-	 */
 	@Override
 	public Description getDescription() {
 		Description description = describeChild(benchmarkClass);
@@ -233,11 +213,6 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 		throw new IllegalArgumentException("Cannot describe" + child);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.junit.runners.ParentRunner#filter(org.junit.runner.manipulation.Filter)
-	 */
 	@Override
 	public void filter(Filter filter) throws NoTestsRemainException {
 
@@ -265,11 +240,6 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.junit.runners.ParentRunner#sort(org.junit.runner.manipulation.Sorter)
-	 */
 	@Override
 	public void sort(Sorter sorter) {
 
@@ -461,39 +431,17 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 			this.delegate = delegate;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.openjdk.jmh.runner.format.OutputFormat#iteration(org.openjdk.jmh.infra.
-		 * BenchmarkParams, org.openjdk.jmh.infra.IterationParams, int)
-		 */
 		@Override
 		public void iteration(BenchmarkParams benchParams, IterationParams params, int iteration) {
 			delegate.iteration(benchParams, params, iteration);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.openjdk.jmh.runner.format.OutputFormat#iterationResult(org.openjdk.jmh.
-		 * infra.BenchmarkParams, org.openjdk.jmh.infra.IterationParams, int,
-		 * org.openjdk.jmh.results.IterationResult)
-		 */
 		@Override
 		public void iterationResult(BenchmarkParams benchParams, IterationParams params, int iteration,
 				IterationResult data) {
 			delegate.iterationResult(benchParams, params, iteration, data);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.openjdk.jmh.runner.format.OutputFormat#startBenchmark(org.openjdk.jmh.infra
-		 * .BenchmarkParams)
-		 */
 		@Override
 		public void startBenchmark(BenchmarkParams benchParams) {
 
@@ -506,13 +454,6 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 			delegate.startBenchmark(benchParams);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.openjdk.jmh.runner.format.OutputFormat#endBenchmark(org.openjdk.jmh.results
-		 * .BenchmarkResult)
-		 */
 		@Override
 		public void endBenchmark(BenchmarkResult result) {
 
@@ -531,41 +472,21 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 			delegate.endBenchmark(result);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#startRun()
-		 */
 		@Override
 		public void startRun() {
 			delegate.startRun();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#endRun(java.util.Collection)
-		 */
 		@Override
 		public void endRun(Collection<RunResult> result) {
 			delegate.endRun(result);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#print(java.lang.String)
-		 */
 		@Override
 		public void print(String s) {
 			delegate.print(s);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#println(java.lang.String)
-		 */
 		@Override
 		public void println(String s) {
 
@@ -580,52 +501,26 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 			delegate.println(s);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#flush()
-		 */
 		@Override
 		public void flush() {
 			delegate.flush();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#close()
-		 */
 		@Override
 		public void close() {
 			delegate.close();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.openjdk.jmh.runner.format.OutputFormat#verbosePrintln(java.lang.String)
-		 */
 		@Override
 		public void verbosePrintln(String s) {
 			delegate.verbosePrintln(s);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#write(int)
-		 */
 		@Override
 		public void write(int b) {
 			delegate.write(b);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.openjdk.jmh.runner.format.OutputFormat#write(byte[])
-		 */
 		@Override
 		public void write(byte[] b) throws IOException {
 			delegate.write(b);
@@ -643,11 +538,6 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 			super(message);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see java.lang.Throwable#fillInStackTrace()
-		 */
 		@Override
 		public synchronized Throwable fillInStackTrace() {
 			return null;
