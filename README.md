@@ -3,9 +3,16 @@ Microbenchmark Runner
 
 [![](https://jitpack.io/v/mp911de/microbenchmark-runner.svg)](https://jitpack.io/#mp911de/microbenchmark-runner) [![Build Status](https://travis-ci.org/mp911de/microbenchmark-runner.svg?branch=master)](https://travis-ci.org/mp911de/microbenchmark-runner)
 
-Microbenchmark Runner is a JUnit (JUnit 4.12/JUnit 5 (Jupiter)) extension to run JMH benchmarks using JUnit directly by using existing JUnit integrations.
+Microbenchmark Runner is a JUnit (JUnit 4.12/JUnit 5 (Jupiter)) extension to launch JMH benchmarks using JUnit directly by using existing JUnit integrations.
 
-Typically, JMH benchmarks are launched using the JMH runner or a tool chain plugin such as Maven or Gradle. This is the ideal approach for JMH benchmark automation. The missing bit in JMH tooling is proper IDE support to selectively run JMH benchmarks when working on benchmarks.
+### Microbenchmark Runner is and what it isn't
+
+This project is an aid during development to launch JMH benchmarks while developing these. Properly launching JMH benchmarks requires ideally the command line, an Uber-JAR and nothing else running to get good results.
+
+During development time, we want quick turnaround times and an IDE that makes it simple to test-run benchmarks and that's what Microbenchmark Runner aims for.
+
+**:warning: Do not use this launcher to run your benchmarks during CI or for actual measurements. Use it during development only. There are too many things that can blur actual results.** 
+
 
 Here is a quick teaser of a what Microbenchmark Runner can do for you:
 
