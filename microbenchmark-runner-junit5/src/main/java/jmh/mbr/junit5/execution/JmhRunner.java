@@ -10,14 +10,18 @@
 package jmh.mbr.junit5.execution;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,6 +30,8 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -39,6 +45,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.format.OutputFormat;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
+import org.opentest4j.TestAbortedException;
 
 import jmh.mbr.core.Environment;
 import jmh.mbr.core.JmhSupport;
@@ -62,12 +69,12 @@ public class JmhRunner {
 
 		getIncludes(testDescriptor).forEach(optionsBuilder::include);
 
-		List<TestDescriptor> methods = collectBenchmarkMethods(testDescriptor);
-
 		if (!support.isEnabled()) {
 			listener.executionSkipped(testDescriptor, "No benchmarks");
 			return;
 		}
+
+		List<TestDescriptor> methods = collectBenchmarkMethods(listener, testDescriptor, optionsBuilder);
 
 		if (!shouldRun(methods)) {
 			return;
@@ -81,17 +88,96 @@ public class JmhRunner {
 		try {
 			listener.executionStarted(testDescriptor);
 			support.publishResults(notifyingOutputFormat, new Runner(options, notifyingOutputFormat).run());
+			executeAfters(methods);
 			listener.executionFinished(testDescriptor, TestExecutionResult.successful());
 		} catch (RunnerException e) {
 			listener.executionFinished(testDescriptor, TestExecutionResult.failed(e));
 		}
 	}
 
-	private List<TestDescriptor> collectBenchmarkMethods(TestDescriptor testDescriptor) {
+	private boolean executeBefores(EngineExecutionListener listener, TestDescriptor test, Class<?> testClass) {
+		boolean include = true;
+		for (Method method : testClass.getDeclaredMethods()) {
+			if (method.isAnnotationPresent(BeforeAll.class)) {
+				if (Modifier.isStatic(method.getModifiers())) {
+					try {
+						method.invoke(null);
+					} catch (TestAbortedException e) {
+						include = false;
+						break;
+					} catch (RuntimeException e) {
+						throw e;
+					} catch (InvocationTargetException e) {
+						if ((e.getTargetException() instanceof TestAbortedException)) {
+							include = false;
+							break;
+						}
+					} catch (Exception e) {
+						if ((e.getCause() instanceof TestAbortedException)) {
+							include = false;
+							break;
+						}
+					}
+				} else {
+					throw new IllegalStateException("Cannot execute non-static @BeforeAll: " + method);
+				}
+			}
+		}
+		if (!include) {
+			listener.executionSkipped(test, "Assumptions failed");
+		}
+		return include;
+	}
+
+	private List<TestDescriptor> executeAfters(List<TestDescriptor> methods) {
+		List<TestDescriptor> filtered = new ArrayList<>();
+		for (TestDescriptor test : methods) {
+			if (test instanceof MethodAware) {
+				MethodAware aware = (MethodAware) test;
+				Class<?> testClass = aware.getMethod().getDeclaringClass();
+				for (Method method : testClass.getDeclaredMethods()) {
+					if (method.isAnnotationPresent(AfterAll.class)) {
+						if (Modifier.isStatic(method.getModifiers())) {
+							try {
+								method.invoke(null);
+								filtered.add(test);
+							} catch (RuntimeException e) {
+								throw e;
+							} catch (Exception e) {
+								throw new IllegalStateException("Cannot invoke before method", e);
+							}
+						} else {
+							throw new IllegalStateException("Cannot execute non-static @AfterAll: " + method);
+						}
+					}
+				}
+			}
+		}
+		return filtered;
+	}
+
+	private List<TestDescriptor> collectBenchmarkMethods(EngineExecutionListener listener, TestDescriptor testDescriptor,
+			ChainedOptionsBuilder options) {
 		List<TestDescriptor> methods = new ArrayList<>();
+		Set<Class<?>> seen = new HashSet<>();
+		Set<Class<?>> excluded = new HashSet<>();
 		testDescriptor.accept(it -> {
 
 			if (it instanceof BenchmarkMethodDescriptor || it instanceof ParametrizedBenchmarkMethodDescriptor) {
+				Method method = ((MethodAware) it).getMethod();
+				Class<?> testClass = method.getDeclaringClass();
+				if (excluded.contains(testClass)) {
+					options.exclude(Pattern.quote(testClass.getName()) + "\\." + Pattern.quote(method.getName()) + "$");
+					return;
+				}
+				if (!seen.contains(testClass)) {
+					seen.add(testClass);
+					if (!executeBefores(listener, it, testClass)) {
+						excluded.add(testClass);
+						options.exclude(Pattern.quote(testClass.getName()) + "\\." + Pattern.quote(method.getName()) + "$");
+						return;
+					}
+				}
 				methods.add(it);
 			}
 		});
@@ -188,9 +274,10 @@ public class JmhRunner {
 
 			TestDescriptor descriptor = descriptionResolver.apply(benchParams);
 
-			listener.executionStarted(descriptor);
-
-			delegate.startBenchmark(benchParams);
+			if (descriptor != null) {
+				listener.executionStarted(descriptor);
+				delegate.startBenchmark(benchParams);
+			}
 		}
 
 		@Override
