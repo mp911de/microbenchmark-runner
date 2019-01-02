@@ -133,7 +133,7 @@ public class JmhSupport {
 	 *
 	 * @param jmhTestClass class under benchmark.
 	 * @return the report file name such as {@code project.version_yyyy-MM-dd_ClassName.json} eg. *
-	 * {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
+	 *         {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
 	 */
 	public String reportFilename(Class<?> jmhTestClass) {
 
@@ -273,12 +273,16 @@ public class JmhSupport {
 			return;
 		}
 
-		String uri = Environment.getProperty("publishTo");
+		String uris = Environment.getProperty("publishTo");
 
-		try {
-			ResultsWriter.forUri(uri).write(output, results);
-		} catch (Exception e) {
-			System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
+		if (uris != null) {
+			for (String uri : uris.split(",")) {
+				try {
+					ResultsWriter.forUri(uri.trim()).write(output, results);
+				} catch (Exception e) {
+					System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
+				}
+			}
 		}
 	}
 
