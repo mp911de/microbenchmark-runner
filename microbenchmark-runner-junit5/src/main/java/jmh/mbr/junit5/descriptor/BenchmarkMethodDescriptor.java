@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -13,7 +13,11 @@ import java.lang.reflect.Method;
 
 import jmh.mbr.core.model.BenchmarkMethod;
 import jmh.mbr.core.model.MethodAware;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.util.ClassUtils;
+import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
@@ -48,6 +52,16 @@ public class BenchmarkMethodDescriptor extends AbstractBenchmarkDescriptor imple
 	@Override
 	public boolean isUnderlyingMethod(Method method) {
 		return this.method.getMethod().equals(method);
+	}
+
+	@Override
+	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
+		return new BenchmarkMethodExtensionContext(parent, engineExecutionListener, this, configurationParameters);
+	}
+
+	@Override
+	public ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent) {
+		return ExtensionUtils.populateNewExtensionRegistryFromExtendWithAnnotation(parent, getMethod());
 	}
 
 	public BenchmarkMethod getBenchmarkMethod() {

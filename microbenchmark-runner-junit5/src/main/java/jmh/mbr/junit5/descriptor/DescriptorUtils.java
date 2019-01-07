@@ -28,17 +28,20 @@ class DescriptorUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(BenchmarkClassDescriptor.class);
 
+	private DescriptorUtils() {
+	}
+
 	protected static Set<TestTag> getTags(AnnotatedElement element) {
 
 		return AnnotationUtils.findRepeatableAnnotations(element, Tag.class).stream().map(Tag::value).filter((tag) -> {
+
 			boolean isValid = TestTag.isValid(tag);
 			if (!isValid) {
-				logger.warn(() -> {
-					return String.format("Configuration error: invalid tag syntax in @Tag(\"%s\") declaration on [%s]. Tag will be ignored.", tag, element);
-				});
+				logger.warn(() -> String.format("Configuration error: invalid tag syntax in @Tag(\"%s\") declaration on [%s]. Tag will be ignored.", tag, element));
 			}
 
 			return isValid;
-		}).map(TestTag::create).collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
+		}).map(TestTag::create)
+				.collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +24,25 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import jmh.mbr.core.Environment;
+import jmh.mbr.core.JmhSupport;
+import jmh.mbr.core.StringUtils;
+import jmh.mbr.core.model.MethodAware;
+import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
+import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
+import org.junit.platform.engine.support.hierarchical.Node.SkipResult;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.IterationParams;
 import org.openjdk.jmh.results.BenchmarkResult;
@@ -40,19 +54,20 @@ import org.openjdk.jmh.runner.format.OutputFormat;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
 
-import jmh.mbr.core.Environment;
-import jmh.mbr.core.JmhSupport;
-import jmh.mbr.core.StringUtils;
-import jmh.mbr.core.model.BenchmarkClass;
-import jmh.mbr.core.model.MethodAware;
-import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
-import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
-import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
-
 /**
  * JMH Benchmark runner.
  */
 public class JmhRunner {
+
+	private static final ConditionEvaluator evaluator = new ConditionEvaluator();
+
+	private final ConfigurationParameters configurationParameters;
+	private final ExtensionRegistry extensionRegistry;
+
+	public JmhRunner(ConfigurationParameters configurationParameters, ExtensionRegistry extensionRegistry) {
+		this.configurationParameters = configurationParameters;
+		this.extensionRegistry = extensionRegistry;
+	}
 
 	public void execute(TestDescriptor testDescriptor, EngineExecutionListener listener) {
 
@@ -60,18 +75,21 @@ public class JmhRunner {
 
 		ChainedOptionsBuilder optionsBuilder = support.options();
 
-		getIncludes(testDescriptor).forEach(optionsBuilder::include);
-
-		List<TestDescriptor> methods = collectBenchmarkMethods(testDescriptor);
+		List<AbstractBenchmarkDescriptor> methods = collectBenchmarkMethods(testDescriptor);
+		List<AbstractBenchmarkDescriptor> includes = getIncludes(testDescriptor);
 
 		if (!support.isEnabled()) {
 			listener.executionSkipped(testDescriptor, "No benchmarks");
 			return;
 		}
 
-		if (!shouldRun(methods)) {
+		List<String> includePatterns = evaluateBenchmarksToRun(includes, listener);
+
+		if (!shouldRun(includePatterns)) {
 			return;
 		}
+
+		includePatterns.forEach(optionsBuilder::include);
 
 		CacheFunction cache = new CacheFunction(methods);
 		Options options = optionsBuilder.build();
@@ -87,64 +105,148 @@ public class JmhRunner {
 		}
 	}
 
-	private List<TestDescriptor> collectBenchmarkMethods(TestDescriptor testDescriptor) {
-		List<TestDescriptor> methods = new ArrayList<>();
+	private List<AbstractBenchmarkDescriptor> collectBenchmarkMethods(TestDescriptor testDescriptor) {
+
+		List<AbstractBenchmarkDescriptor> methods = new ArrayList<>();
+
 		testDescriptor.accept(it -> {
 
 			if (it instanceof BenchmarkMethodDescriptor || it instanceof ParametrizedBenchmarkMethodDescriptor) {
-				methods.add(it);
+				methods.add((AbstractBenchmarkDescriptor) it);
 			}
 		});
+
 		return methods;
 	}
 
-	private boolean shouldRun(List<TestDescriptor> methods) {
+	private boolean shouldRun(List<?> methods) {
 		return !methods.isEmpty();
 	}
 
-	private List<String> getIncludes(TestDescriptor testDescriptor) {
+	@SuppressWarnings("unchecked")
+	private List<AbstractBenchmarkDescriptor> getIncludes(TestDescriptor testDescriptor) {
 
 		String tests = Environment.getProperty("benchmark");
 
-		if (!StringUtils.hasText(tests)) {
-
-			List<Method> methods = new ArrayList<>();
-
-			testDescriptor.accept(it -> {
-
-				if (it instanceof MethodAware) {
-					methods.add(((MethodAware) it).getMethod());
-				}
-			});
-
-			return methods.stream()
-					.map(it -> Pattern.quote(it.getDeclaringClass().getName()) + "\\." + Pattern.quote(it.getName()) + "$")
-					.collect(Collectors.toList());
-		}
-
-		List<BenchmarkClass> classes = new ArrayList<>();
+		List<BenchmarkClassDescriptor> classes = new ArrayList<>();
 
 		testDescriptor.accept(it -> {
 
-			if (it instanceof BenchmarkClass) {
-				classes.add((BenchmarkClass) it);
+			if (it instanceof BenchmarkClassDescriptor) {
+				classes.add((BenchmarkClassDescriptor) it);
 			}
 		});
 
-		if (classes.stream().anyMatch(it -> {
+		if (!StringUtils.hasText(tests)) {
+			return (List) classes;
+		}
+
+		return classes.stream().filter(it -> {
 
 			Class<?> javaClass = it.getJavaClass();
 			return tests.contains(javaClass.getName()) || tests.contains(javaClass.getSimpleName());
-		})) {
-			if (!tests.contains("#")) {
-				return Collections.singletonList(".*" + tests + ".*");
-			}
+		}).flatMap(it -> {
 
-			String[] args = tests.split("#");
-			return Collections.singletonList(".*" + args[0] + "." + args[1]);
+			if (tests.contains("#")) {
+
+				String[] split = tests.split("#");
+				String methodNameFilter = split[1];
+
+				return it.getChildren().stream()
+						.filter(MethodAware.class::isInstance)
+						.map(MethodAware.class::cast)
+						.filter(member -> member.getMethod().getName().equals(methodNameFilter));
+			} else {
+				return Stream.of(it);
+			}
+		}).map(AbstractBenchmarkDescriptor.class::cast).collect(Collectors.toList());
+	}
+
+	List<String> evaluateBenchmarksToRun(List<AbstractBenchmarkDescriptor> includes, EngineExecutionListener listener) {
+
+		try (ExtensionContextProvider contextProvider = ExtensionContextProvider.create(listener, configurationParameters)) {
+
+			List<String> includePatterns = new ArrayList<>();
+
+			includes.stream()
+					.filter(BenchmarkClassDescriptor.class::isInstance)
+					.map(BenchmarkClassDescriptor.class::cast)
+					.forEach(descriptor -> {
+
+						ExtensionContext classExtensionContext = contextProvider.getExtensionContext(descriptor);
+						List<String> methodIncludePatterns = new ArrayList<>();
+
+						SkipResult shouldRun = shouldRun(classExtensionContext, descriptor, listener);
+
+						if (shouldRun.isSkipped()) {
+							listener.executionSkipped(descriptor, shouldRun.getReason().get());
+							return;
+						}
+
+						descriptor.accept(it -> {
+							if (it instanceof MethodAware) {
+								shouldRun(classExtensionContext, (MethodAware) it, listener).includeIfEnabled(methodIncludePatterns);
+							}
+						});
+
+						if (methodIncludePatterns.isEmpty()) {
+							listener.executionSkipped(descriptor, "No methods to run");
+						} else {
+							includePatterns.addAll(methodIncludePatterns);
+						}
+					});
+
+			includes.stream()
+					.filter(MethodAware.class::isInstance)
+					.forEach(descriptor -> {
+						ExtensionContext parentContext = contextProvider.getExtensionContext(descriptor.getParent());
+						shouldRun(parentContext, (MethodAware) descriptor, listener).includeIfEnabled(includePatterns);
+					});
+
+			return includePatterns;
+		}
+	}
+
+	private SkipResult shouldRun(ExtensionContext parent, AbstractBenchmarkDescriptor descriptor, EngineExecutionListener listener) {
+
+		ExtensionRegistry extensionRegistry = descriptor.getExtensionRegistry(this.extensionRegistry);
+		ExtensionContext extensionContext = descriptor.getExtensionContext(parent, listener, configurationParameters);
+
+		ConditionEvaluationResult evaluationResult = evaluator.evaluate(extensionRegistry, extensionContext);
+
+		if (evaluationResult.isDisabled()) {
+			return SkipResult.skip(evaluationResult.getReason().orElse("<unknown>"));
+		}
+		return SkipResult.doNotSkip();
+	}
+
+	private ConditionalExecution shouldRun(ExtensionContext parent, MethodAware methodAware, EngineExecutionListener listener) {
+
+		AbstractBenchmarkDescriptor descriptor = (AbstractBenchmarkDescriptor) methodAware;
+		SkipResult skipResult = shouldRun(parent, descriptor, listener);
+
+		return new ConditionalExecution(skipResult, methodAware);
+	}
+
+	/**
+	 * Value object representing the outcome of condition evaluation for a benchmark method.
+	 */
+	static class ConditionalExecution {
+
+		private final SkipResult skipResult;
+		private final MethodAware methodAware;
+
+		private ConditionalExecution(SkipResult skipResult, MethodAware methodAware) {
+			this.skipResult = skipResult;
+			this.methodAware = methodAware;
 		}
 
-		return Collections.emptyList();
+		public void includeIfEnabled(List<String> includePatterns) {
+			if (!skipResult.isSkipped()) {
+				Method method = methodAware.getMethod();
+				includePatterns.add(Pattern.quote(method.getDeclaringClass().getName()) + "\\." + Pattern.quote(method.getName()) + "$");
+			}
+		}
 	}
 
 	/**
@@ -175,7 +277,7 @@ public class JmhRunner {
 
 		@Override
 		public void iterationResult(BenchmarkParams benchParams, IterationParams params, int iteration,
-				IterationResult data) {
+									IterationResult data) {
 			delegate.iterationResult(benchParams, params, iteration, data);
 		}
 
@@ -343,9 +445,9 @@ public class JmhRunner {
 	static class CacheFunction implements Function<BenchmarkParams, TestDescriptor> {
 
 		private final Map<String, TestDescriptor> methodMap = new ConcurrentHashMap<>();
-		private final Collection<TestDescriptor> methods;
+		private final Collection<? extends TestDescriptor> methods;
 
-		CacheFunction(Collection<TestDescriptor> methods) {
+		CacheFunction(Collection<? extends TestDescriptor> methods) {
 			this.methods = methods;
 		}
 
@@ -387,7 +489,7 @@ public class JmhRunner {
 
 			return methodMap.computeIfAbsent(benchmark.getBenchmark(), key -> {
 
-				Optional<TestDescriptor> method = methods.stream().filter(it -> getBenchmarkName(it).equals(key)).findFirst();
+				Optional<? extends TestDescriptor> method = methods.stream().filter(it -> getBenchmarkName(it).equals(key)).findFirst();
 
 				return method.orElseThrow(() -> new IllegalArgumentException(
 						String.format("Cannot resolve %s to a BenchmarkDescriptor!", benchmark.getBenchmark())));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -14,6 +14,7 @@ import jmh.mbr.junit5.discovery.DiscoverySelectorResolver;
 import java.util.Optional;
 
 import jmh.mbr.junit5.execution.JmhRunner;
+import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -42,7 +43,10 @@ public class MicrobenchmarkEngine implements TestEngine {
 
 	@Override
 	public void execute(ExecutionRequest request) {
-		new JmhRunner().execute(request.getRootTestDescriptor(), request.getEngineExecutionListener());
+
+		ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(request.getConfigurationParameters());
+
+		new JmhRunner(request.getConfigurationParameters(), extensionRegistry).execute(request.getRootTestDescriptor(), request.getEngineExecutionListener());
 	}
 
 	@Override

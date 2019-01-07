@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -13,6 +13,10 @@ import java.util.Set;
 
 import jmh.mbr.core.model.BenchmarkFixture;
 import jmh.mbr.core.model.BenchmarkMethod;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
@@ -39,6 +43,16 @@ public class BenchmarkFixtureDescriptor extends AbstractBenchmarkDescriptor {
 	@Override
 	public Type getType() {
 		return Type.TEST;
+	}
+
+	@Override
+	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent) {
+		throw new UnsupportedOperationException();
 	}
 
 	public BenchmarkFixture getFixture() {
