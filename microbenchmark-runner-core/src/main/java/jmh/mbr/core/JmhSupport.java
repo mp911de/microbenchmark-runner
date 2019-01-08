@@ -132,8 +132,8 @@ public class JmhSupport {
 	 * Returns the report file name for {@link Class class under benchmark}.
 	 *
 	 * @param jmhTestClass class under benchmark.
-	 * @return the report file name such as {@code project.version_yyyy-MM-dd_ClassName.json} eg. *
-	 *         {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
+	 * @return the report file name such as {@code project.version_yyyy-MM-dd_ClassName.json} eg.
+	 * {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
 	 */
 	public String reportFilename(Class<?> jmhTestClass) {
 

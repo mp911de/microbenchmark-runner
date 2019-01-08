@@ -10,18 +10,28 @@
 package jmh.mbr.core;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.format.OutputFormat;
 
 public class TestResultsWriterFactory implements ResultsWriterFactory {
 
-	@Override
-	public ResultsWriter forUri(String uri) {
-		return uri.equals("urn:empty") ? new TestResultsWriter() : null;
+	static Map<String, Supplier<ResultsWriter>> REGISTRY = new HashMap<>();
+
+	static {
+		REGISTRY.put("urn:empty", TestResultsWriter::new);
 	}
 
-	class TestResultsWriter implements ResultsWriter {
+	@Override
+	public ResultsWriter forUri(String uri) {
+		return REGISTRY.getOrDefault(uri, () -> null).get();
+	}
+
+	static class TestResultsWriter implements ResultsWriter {
+
 		@Override
 		public void write(OutputFormat output, Collection<RunResult> results) {
 		}
