@@ -53,10 +53,7 @@ public class SimpleBenchmark {
 }
 ```
 
-Decorate your JMH benchmark with `@Microbenchmark`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. Adding `@Testable` to benchmark methods allows direct entry points to methods without the need to run the benchmark first.  
-
-![Start JMH benchmark methods](src/main/resources/start-benchmark.png)
-
+Annotate your JMH benchmark with `@Microbenchmark`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. 
 
 # Integrate it in your project
 
