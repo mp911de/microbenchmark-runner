@@ -18,6 +18,7 @@
 
 	<modules>
 		<module>microbenchmark-runner-core</module>
+		<module>microbenchmark-runner-extras</module>
 		<module>microbenchmark-runner-junit4</module>
 		<module>microbenchmark-runner-junit5</module>
 	</modules>
