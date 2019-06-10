@@ -9,8 +9,6 @@
  */
 package jmh.mbr.core;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +21,8 @@ import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.format.OutputFormat;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Unit tests for {@link JmhSupport}.
  */
@@ -34,7 +34,7 @@ class JmhSupportUnitTests {
 		TestResultsWriterFactory.REGISTRY.put("foo", FooResultWriter::new);
 		TestResultsWriterFactory.REGISTRY.put("bar", BarResultWriter::new);
 
-		System.setProperty("publishTo", "foo,bar");
+		System.setProperty("publishTo", "foo,bar,none");
 
 		try {
 			JmhSupport support = new JmhSupport();
@@ -48,6 +48,22 @@ class JmhSupportUnitTests {
 
 		assertThat(FooResultWriter.written).isTrue();
 		assertThat(BarResultWriter.written).isTrue();
+	}
+
+	@Test
+	void shouldBeAbleToWriteToEmptyUri() {
+
+		TestResultsWriterFactory.REGISTRY.put("", FooResultWriter::new);
+
+		try {
+			JmhSupport support = new JmhSupport();
+			RunResult runResult = new RunResult(null, Collections.emptyList());
+			support.publishResults(SilentOutputFormat.INSTANCE, Collections.singleton(runResult));
+		} finally {
+			TestResultsWriterFactory.REGISTRY.remove("");
+		}
+
+		assertThat(FooResultWriter.written).isTrue();
 	}
 
 	static class FooResultWriter implements ResultsWriter {
@@ -80,7 +96,8 @@ class JmhSupportUnitTests {
 		}
 
 		@Override
-		public void iterationResult(BenchmarkParams benchParams, IterationParams params, int iteration, IterationResult data) {
+		public void iterationResult(BenchmarkParams benchParams, IterationParams params, int iteration,
+				IterationResult data) {
 
 		}
 
