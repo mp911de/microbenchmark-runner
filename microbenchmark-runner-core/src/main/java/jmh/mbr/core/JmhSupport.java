@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -133,7 +132,7 @@ public class JmhSupport {
 	 *
 	 * @param jmhTestClass class under benchmark.
 	 * @return the report file name such as {@code project.version_yyyy-MM-dd_ClassName.json} eg.
-	 * {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
+	 *         {@literal 1.11.0.BUILD-SNAPSHOT_2017-03-07_MappingMongoConverterBenchmark.json}
 	 */
 	public String reportFilename(Class<?> jmhTestClass) {
 
@@ -253,35 +252,29 @@ public class JmhSupport {
 	}
 
 	/**
-	 * Resolve the given resource location to a {@code java.io.File}, i.e. to a file in the file system.
-	 *
-	 * @param resourceLocation the resource location.
-	 * @return {@link File} for {@code resourceLocation}.
-	 */
-	private File getFile(String resourceLocation) {
-		return new File(URI.create(resourceLocation));
-	}
-
-	/**
 	 * Publish results to an external system.
 	 *
 	 * @param results must not be {@literal null}.
 	 */
 	public void publishResults(OutputFormat output, Collection<RunResult> results) {
 
-		if (results.isEmpty() || !Environment.containsProperty("publishTo")) {
-			return;
-		}
-
 		String uris = Environment.getProperty("publishTo");
 
+		String[] split;
 		if (uris != null) {
-			for (String uri : uris.split(",")) {
-				try {
-					ResultsWriter.forUri(uri.trim()).write(output, results);
-				} catch (Exception e) {
-					System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
+			split = uris.split(",");
+		} else {
+			// If not specified we pass in null so the result writer has a chance
+			split = new String[] { "" };
+		}
+		for (String uri : split) {
+			try {
+				ResultsWriter writer = ResultsWriter.forUri(uri.trim());
+				if (writer != null) {
+					writer.write(output, results);
 				}
+			} catch (Exception e) {
+				System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
 			}
 		}
 	}

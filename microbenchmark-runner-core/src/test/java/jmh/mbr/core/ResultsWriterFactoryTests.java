@@ -21,6 +21,11 @@ class ResultsWriterFactoryTests {
 	}
 
 	@Test
+	void nouri() {
+		assertThat(ResultsWriter.forUri("")).isNull();
+	}
+
+	@Test
 	void empty() {
 		assertThat(ResultsWriter.forUri("file:./target")).isNull();
 	}
