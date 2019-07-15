@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import jmh.mbr.core.ResultsWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Mode;
@@ -53,6 +54,16 @@ class CsvResultsWriterFactoryTests {
 	@Test
 	void validUri() {
 		assertThat(factory.forUri("csv:target/empty.csv")).isNotNull();
+	}
+
+	@Test
+	void emptyUri() {
+		ResultsWriter writer = factory.forUri(null);
+		assertThat(writer).isNotNull();
+		OutputStream stream = new ByteArrayOutputStream();
+		OutputFormat output = OutputFormatFactory.createFormatInstance(new PrintStream(stream), VerboseMode.NORMAL);
+		RunResult runResult = new RunResult(null, Collections.emptyList());
+		writer.write(output, Arrays.asList(runResult));
 	}
 
 	@Test
