@@ -21,11 +21,6 @@ public class CsvResultsWriterFactory implements ResultsWriterFactory {
 
 	@Override
 	public ResultsWriter forUri(String uri) {
-
-		if (!uri.startsWith("csv:")) {
-			return null;
-		}
-
 		return new CsvResultsWriter(uri);
 	}
 }

@@ -41,7 +41,8 @@ class CsvResultsWriter implements ResultsWriter {
 
 		try {
 			report = createReport(results);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 
 			StringWriter trace = new StringWriter();
 			e.printStackTrace(new PrintWriter(trace));
@@ -52,15 +53,18 @@ class CsvResultsWriter implements ResultsWriter {
 
 		output.println(report);
 
-		File file = new File(uri.substring("csv:".length()));
-		output.println(System.lineSeparator());
-		output.println("Writing result to file: " + file);
-		file.getParentFile().mkdirs();
-		if (file.getParentFile().exists()) {
-			try {
-				FileUtils.writeLines(file, Collections.singleton(report));
-			} catch (IOException e) {
-				output.println("Write failed: " + e.getMessage());
+		if (uri != null) {
+			File file = new File(uri.substring("csv:".length()));
+			output.println(System.lineSeparator());
+			output.println("Writing result to file: " + file);
+			file.getParentFile().mkdirs();
+			if (file.getParentFile().exists()) {
+				try {
+					FileUtils.writeLines(file, Collections.singleton(report));
+				}
+				catch (IOException e) {
+					output.println("Write failed: " + e.getMessage());
+				}
 			}
 		}
 	}
@@ -82,14 +86,17 @@ class CsvResultsWriter implements ResultsWriter {
 			StringBuilder builder = new StringBuilder();
 			if (result.getParams() != null) {
 				String benchmark = result.getParams().getBenchmark();
-				String cls = benchmark.contains(".") ? benchmark.substring(0, benchmark.lastIndexOf(".")) : benchmark;
+				String cls = benchmark.contains(".")
+						? benchmark.substring(0, benchmark.lastIndexOf("."))
+						: benchmark;
 				String mthd = benchmark.substring(benchmark.lastIndexOf(".") + 1);
 				builder.append(cls).append(", ").append(mthd).append(", ");
 				for (int i = 0; i < params.values().size(); i++) {
 					boolean found = false;
 					for (String param : result.getParams().getParamsKeys()) {
 						if (params.get(param) == i) {
-							builder.append(result.getParams().getParam(param)).append(", ");
+							builder.append(result.getParams().getParam(param))
+									.append(", ");
 							found = true;
 						}
 					}
@@ -101,12 +108,14 @@ class CsvResultsWriter implements ResultsWriter {
 
 			if (result.getAggregatedResult() != null) {
 
-				Map<String, Result> second = result.getAggregatedResult().getSecondaryResults();
+				Map<String, Result> second = result.getAggregatedResult()
+						.getSecondaryResults();
 				for (int i = 0; i < auxes.values().size(); i++) {
 					boolean found = false;
 					for (String param : second.keySet()) {
 						if (auxes.get(param) == i) {
-							builder.append(ScoreFormatter.format(second.get(param).getStatistics().getPercentile(0.5)))
+							builder.append(ScoreFormatter.format(
+									second.get(param).getStatistics().getPercentile(0.5)))
 									.append(", ");
 							found = true;
 						}
@@ -137,7 +146,8 @@ class CsvResultsWriter implements ResultsWriter {
 		for (RunResult result : results) {
 			if (result.getAggregatedResult() != null) {
 				@SuppressWarnings("rawtypes")
-				Map<String, Result> second = result.getAggregatedResult().getSecondaryResults();
+				Map<String, Result> second = result.getAggregatedResult()
+						.getSecondaryResults();
 				if (second != null) {
 					for (String aux : second.keySet()) {
 						int count = auxPlaces;
@@ -184,7 +194,8 @@ class CsvResultsWriter implements ResultsWriter {
 		char updatedChar;
 		if (capitalize) {
 			updatedChar = Character.toUpperCase(baseChar);
-		} else {
+		}
+		else {
 			updatedChar = Character.toLowerCase(baseChar);
 		}
 		if (baseChar == updatedChar) {
