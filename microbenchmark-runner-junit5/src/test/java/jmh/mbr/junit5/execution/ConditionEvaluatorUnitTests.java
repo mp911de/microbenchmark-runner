@@ -9,8 +9,6 @@
  */
 package jmh.mbr.junit5.execution;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.Collections;
 import java.util.Optional;
 
@@ -22,10 +20,14 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.UniqueId;
 import org.openjdk.jmh.annotations.Benchmark;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Unit tests for {@link ConditionEvaluator}.
@@ -35,12 +37,14 @@ public class ConditionEvaluatorUnitTests {
 	@Test
 	void shouldRunWithoutCondition() {
 
-		ExtensionRegistry registry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE);
+		ExtensionRegistry registry = MutableExtensionRegistry
+				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE));
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(SimpleBenchmarkClass.class);
 
 		ConditionEvaluator evaluator = new ConditionEvaluator();
-		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
+		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor
+				.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
 
 		assertThat(result.isDisabled()).isFalse();
 	}
@@ -48,12 +52,14 @@ public class ConditionEvaluatorUnitTests {
 	@Test
 	void shouldSkipDisabledBenchmarkClass() {
 
-		ExtensionRegistry registry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE);
+		ExtensionRegistry registry = MutableExtensionRegistry
+				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE));
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(DisabledBenchmark.class);
 
 		ConditionEvaluator evaluator = new ConditionEvaluator();
-		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
+		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor
+				.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
 
 		assertThat(result.isDisabled()).isTrue();
 	}
@@ -61,21 +67,25 @@ public class ConditionEvaluatorUnitTests {
 	@Test
 	void shouldSkipDisabledThroughExtensionClass() {
 
-		ExtensionRegistry parentRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE);
+		MutableExtensionRegistry parentRegistry = MutableExtensionRegistry
+				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE));
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(CustomExtensionBenchmark.class);
 		ExtensionRegistry registry = descriptor.getExtensionRegistry(parentRegistry);
 
 		ConditionEvaluator evaluator = new ConditionEvaluator();
-		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
+		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor
+				.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
 
 		assertThat(result.isDisabled()).isTrue();
 		assertThat(result.getReason()).contains("always disabled");
 	}
 
 	private BenchmarkClassDescriptor createDescriptor(Class<?> javaClass) {
-		BenchmarkClass benchmarkClass = BenchmarkClass.create(javaClass, Collections.emptyList());
-		return new BenchmarkClassDescriptor(UniqueId.root("root", "root"), benchmarkClass);
+		BenchmarkClass benchmarkClass = BenchmarkClass
+				.create(javaClass, Collections.emptyList());
+		return new BenchmarkClassDescriptor(UniqueId
+				.root("root", "root"), benchmarkClass);
 	}
 
 

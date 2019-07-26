@@ -15,6 +15,7 @@ import jmh.mbr.core.model.BenchmarkFixture;
 import jmh.mbr.core.model.BenchmarkMethod;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestTag;
@@ -51,7 +52,7 @@ public class BenchmarkFixtureDescriptor extends AbstractBenchmarkDescriptor {
 	}
 
 	@Override
-	public ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent) {
+	public ExtensionRegistry getExtensionRegistry(MutableExtensionRegistry parent) {
 		throw new UnsupportedOperationException();
 	}
 

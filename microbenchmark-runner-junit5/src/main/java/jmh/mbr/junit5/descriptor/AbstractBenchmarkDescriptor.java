@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestSource;
@@ -46,8 +47,10 @@ public abstract class AbstractBenchmarkDescriptor extends AbstractTestDescriptor
 		}
 		if (source instanceof MethodSource) {
 			try {
-				tags = DescriptorUtils.getTags(Class.forName(((MethodSource) source).getClassName()));
-			} catch (ClassNotFoundException e) {
+				tags = DescriptorUtils
+						.getTags(Class.forName(((MethodSource) source).getClassName()));
+			}
+			catch (ClassNotFoundException e) {
 				throw new IllegalStateException(e);
 			}
 		}
@@ -71,10 +74,10 @@ public abstract class AbstractBenchmarkDescriptor extends AbstractTestDescriptor
 	public abstract ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters);
 
 	/**
-	 * Creates an {@link ExtensionRegistry} that contains extensions derived from the benchmark source (annotations on class/method level).
+	 * Creates an {@link MutableExtensionRegistry} that contains extensions derived from the benchmark source (annotations on class/method level).
 	 *
-	 * @param parent the parent {@link ExtensionRegistry}.
+	 * @param parent the parent {@link MutableExtensionRegistry}.
 	 * @return the {@link ExtensionRegistry} derived from this descriptor.
 	 */
-	public abstract ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent);
+	public abstract ExtensionRegistry getExtensionRegistry(MutableExtensionRegistry parent);
 }

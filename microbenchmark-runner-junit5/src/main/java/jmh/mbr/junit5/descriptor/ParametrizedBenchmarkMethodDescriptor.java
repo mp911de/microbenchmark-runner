@@ -16,6 +16,7 @@ import jmh.mbr.core.model.MethodAware;
 import jmh.mbr.core.model.ParametrizedBenchmarkMethod;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.commons.util.ClassUtils;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -35,9 +36,10 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractBenchmarkDesc
 	}
 
 	private ParametrizedBenchmarkMethodDescriptor(UniqueId uniqueId, BenchmarkMethod benchmarkMethod,
-												  ParametrizedBenchmarkMethod parametrizedMethod) {
+			ParametrizedBenchmarkMethod parametrizedMethod) {
 		super(uniqueId, generateDefaultDisplayName(benchmarkMethod.getMethod()),
-				MethodSource.from(benchmarkMethod.getDeclaringClass(), benchmarkMethod.getMethod()));
+				MethodSource.from(benchmarkMethod.getDeclaringClass(), benchmarkMethod
+						.getMethod()));
 		this.method = benchmarkMethod;
 		this.parametrizedMethod = parametrizedMethod;
 	}
@@ -68,8 +70,9 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractBenchmarkDesc
 	}
 
 	@Override
-	public ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent) {
-		return ExtensionUtils.populateNewExtensionRegistryFromExtendWithAnnotation(parent, getMethod());
+	public ExtensionRegistry getExtensionRegistry(MutableExtensionRegistry parent) {
+		return ExtensionUtils
+				.populateNewExtensionRegistryFromExtendWithAnnotation(parent, getMethod());
 	}
 
 	public ParametrizedBenchmarkMethod getParametrizedMethod() {
@@ -82,6 +85,7 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractBenchmarkDesc
 
 	private static String generateDefaultDisplayName(Method testMethod) {
 		return String.format("%s(%s)", testMethod.getName(),
-				ClassUtils.nullSafeToString(Class::getSimpleName, testMethod.getParameterTypes()));
+				ClassUtils.nullSafeToString(Class::getSimpleName, testMethod
+						.getParameterTypes()));
 	}
 }

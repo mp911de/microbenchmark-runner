@@ -9,8 +9,6 @@
  */
 package jmh.mbr.junit5.execution;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +23,8 @@ import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -34,66 +33,87 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.reporting.ReportEntry;
 import org.openjdk.jmh.annotations.Benchmark;
 
+import static org.assertj.core.api.Assertions.*;
+
 /**
  * Unit tests for {@link JmhRunner}.
  */
 public class JmhRunnerUnitTests {
 
-	JmhRunner runner = new JmhRunner(EmptyConfigurationParameters.INSTANCE, ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE));
+	JmhRunner runner = new JmhRunner(EmptyConfigurationParameters.INSTANCE, MutableExtensionRegistry
+			.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE)));
 
 	@Test
 	void shouldIncludeUnconditionalBenchmarkClass() {
 
-		List<AbstractBenchmarkDescriptor> descriptors = Collections.singletonList(createDescriptor(SimpleBenchmarkClass.class));
+		List<AbstractBenchmarkDescriptor> descriptors = Collections
+				.singletonList(createDescriptor(SimpleBenchmarkClass.class));
 
-		List<String> includePatterns = runner.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
+		List<String> includePatterns = runner
+				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
-		assertThat(includePatterns).hasSize(1).contains(Pattern.quote(SimpleBenchmarkClass.class.getName()) + "\\." + Pattern.quote("justOne") + "$");
+		assertThat(includePatterns).hasSize(1).contains(Pattern
+				.quote(SimpleBenchmarkClass.class.getName()) + "\\." + Pattern
+				.quote("justOne") + "$");
 	}
 
 	@Test
 	void shouldIncludeUnconditionalBenchmarkMethod() {
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(SimpleBenchmarkClass.class);
-		List<AbstractBenchmarkDescriptor> descriptors = Collections.singletonList((AbstractBenchmarkDescriptor) descriptor.getChildren().iterator().next());
+		List<AbstractBenchmarkDescriptor> descriptors = Collections
+				.singletonList((AbstractBenchmarkDescriptor) descriptor.getChildren()
+						.iterator().next());
 
-		List<String> includePatterns = runner.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
+		List<String> includePatterns = runner
+				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
-		assertThat(includePatterns).hasSize(1).contains(Pattern.quote(SimpleBenchmarkClass.class.getName()) + "\\." + Pattern.quote("justOne") + "$");
+		assertThat(includePatterns).hasSize(1).contains(Pattern
+				.quote(SimpleBenchmarkClass.class.getName()) + "\\." + Pattern
+				.quote("justOne") + "$");
 	}
 
 	@Test
 	void shouldIncludeEnabledMethod() {
 
-		List<AbstractBenchmarkDescriptor> descriptors = Collections.singletonList(createDescriptor(ConditionalMethods.class));
+		List<AbstractBenchmarkDescriptor> descriptors = Collections
+				.singletonList(createDescriptor(ConditionalMethods.class));
 
-		List<String> includePatterns = runner.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
+		List<String> includePatterns = runner
+				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
-		assertThat(includePatterns).hasSize(1).contains(Pattern.quote(ConditionalMethods.class.getName()) + "\\." + Pattern.quote("enabled") + "$");
+		assertThat(includePatterns).hasSize(1).contains(Pattern
+				.quote(ConditionalMethods.class.getName()) + "\\." + Pattern
+				.quote("enabled") + "$");
 	}
 
 	@Test
 	void shouldNotContainDisabledBenchmarkClass() {
 
-		List<AbstractBenchmarkDescriptor> descriptors = Collections.singletonList(createDescriptor(DisabledBenchmark.class));
+		List<AbstractBenchmarkDescriptor> descriptors = Collections
+				.singletonList(createDescriptor(DisabledBenchmark.class));
 
-		List<String> includePatterns = runner.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
+		List<String> includePatterns = runner
+				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
 		assertThat(includePatterns).isEmpty();
 	}
 
 	private BenchmarkClassDescriptor createDescriptor(Class<?> javaClass) {
 
-		BenchmarkClass benchmarkClass = BenchmarkDescriptorFactory.create(javaClass).createDescriptor();
+		BenchmarkClass benchmarkClass = BenchmarkDescriptorFactory.create(javaClass)
+				.createDescriptor();
 
-		BenchmarkClassDescriptor descriptor = new BenchmarkClassDescriptor(UniqueId.root("root", "root"), benchmarkClass);
+		BenchmarkClassDescriptor descriptor = new BenchmarkClassDescriptor(UniqueId
+				.root("root", "root"), benchmarkClass);
 
 		for (BenchmarkDescriptor child : benchmarkClass.getChildren()) {
 
 			if (child instanceof BenchmarkMethod) {
 				BenchmarkMethod method = (BenchmarkMethod) child;
 
-				descriptor.addChild(new BenchmarkMethodDescriptor(descriptor.getUniqueId().append("method", (method).getName()), method));
+				descriptor.addChild(new BenchmarkMethodDescriptor(descriptor.getUniqueId()
+						.append("method", (method).getName()), method));
 			}
 		}
 

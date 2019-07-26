@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 
@@ -45,6 +46,11 @@ class BenchmarkClassExtensionContext extends AbstractExtensionContext<BenchmarkC
 
 	@Override
 	public Optional<Object> getTestInstance() {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<TestInstances> getTestInstances() {
 		return Optional.empty();
 	}
 

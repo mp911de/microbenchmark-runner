@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.commons.util.AnnotationUtils;
 
 /**
@@ -27,15 +28,17 @@ abstract class ExtensionUtils {
 	private ExtensionUtils() {
 	}
 
-	static ExtensionRegistry populateNewExtensionRegistryFromExtendWithAnnotation(ExtensionRegistry parentRegistry,
-																				  AnnotatedElement annotatedElement) {
+	static ExtensionRegistry populateNewExtensionRegistryFromExtendWithAnnotation(MutableExtensionRegistry parentRegistry,
+			AnnotatedElement annotatedElement) {
 
-		List<Class<? extends Extension>> extensionTypes = AnnotationUtils.findRepeatableAnnotations(annotatedElement, ExtendWith.class)
+		List<Class<? extends Extension>> extensionTypes = AnnotationUtils
+				.findRepeatableAnnotations(annotatedElement, ExtendWith.class)
 				.stream()
 				.map(ExtendWith::value)
 				.flatMap(Arrays::stream)
 				.collect(Collectors.toList());
 
-		return ExtensionRegistry.createRegistryFrom(parentRegistry, extensionTypes);
+		return MutableExtensionRegistry
+				.createRegistryFrom(parentRegistry, extensionTypes);
 	}
 }

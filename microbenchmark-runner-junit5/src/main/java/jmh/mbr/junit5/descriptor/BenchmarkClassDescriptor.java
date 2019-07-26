@@ -12,6 +12,7 @@ package jmh.mbr.junit5.descriptor;
 import jmh.mbr.core.model.BenchmarkClass;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.UniqueId;
@@ -49,7 +50,7 @@ public class BenchmarkClassDescriptor extends AbstractBenchmarkDescriptor {
 	}
 
 	@Override
-	public ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent) {
+	public ExtensionRegistry getExtensionRegistry(MutableExtensionRegistry parent) {
 		return ExtensionUtils.populateNewExtensionRegistryFromExtendWithAnnotation(parent, getJavaClass());
 	}
 }

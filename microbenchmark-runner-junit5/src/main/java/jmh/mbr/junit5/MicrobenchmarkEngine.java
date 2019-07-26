@@ -9,12 +9,13 @@
  */
 package jmh.mbr.junit5;
 
-import jmh.mbr.junit5.discovery.DiscoverySelectorResolver;
-
 import java.util.Optional;
 
+import jmh.mbr.junit5.discovery.DiscoverySelectorResolver;
 import jmh.mbr.junit5.execution.JmhRunner;
-import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -37,16 +38,22 @@ public class MicrobenchmarkEngine implements TestEngine {
 	public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
 
 		MicrobenchmarkEngineDescriptor engineDescriptor = new MicrobenchmarkEngineDescriptor(uniqueId);
-		new DiscoverySelectorResolver().resolveSelectors(discoveryRequest, engineDescriptor);
+		new DiscoverySelectorResolver()
+				.resolveSelectors(discoveryRequest, engineDescriptor);
 		return engineDescriptor;
 	}
 
 	@Override
 	public void execute(ExecutionRequest request) {
 
-		ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(request.getConfigurationParameters());
+		JupiterConfiguration jupiterConfiguration = new DefaultJupiterConfiguration(request
+				.getConfigurationParameters());
+		MutableExtensionRegistry extensionRegistry = MutableExtensionRegistry
+				.createRegistryWithDefaultExtensions(jupiterConfiguration);
 
-		new JmhRunner(request.getConfigurationParameters(), extensionRegistry).execute(request.getRootTestDescriptor(), request.getEngineExecutionListener());
+		new JmhRunner(request.getConfigurationParameters(), extensionRegistry)
+				.execute(request.getRootTestDescriptor(), request
+						.getEngineExecutionListener());
 	}
 
 	@Override

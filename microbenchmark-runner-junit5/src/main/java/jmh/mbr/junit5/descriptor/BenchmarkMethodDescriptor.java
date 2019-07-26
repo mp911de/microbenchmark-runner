@@ -15,6 +15,7 @@ import jmh.mbr.core.model.BenchmarkMethod;
 import jmh.mbr.core.model.MethodAware;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.commons.util.ClassUtils;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -60,7 +61,7 @@ public class BenchmarkMethodDescriptor extends AbstractBenchmarkDescriptor imple
 	}
 
 	@Override
-	public ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent) {
+	public ExtensionRegistry getExtensionRegistry(MutableExtensionRegistry parent) {
 		return ExtensionUtils.populateNewExtensionRegistryFromExtendWithAnnotation(parent, getMethod());
 	}
 

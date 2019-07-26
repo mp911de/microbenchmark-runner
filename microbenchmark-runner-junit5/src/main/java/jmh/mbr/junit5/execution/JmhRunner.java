@@ -38,6 +38,7 @@ import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -62,9 +63,9 @@ public class JmhRunner {
 	private static final ConditionEvaluator evaluator = new ConditionEvaluator();
 
 	private final ConfigurationParameters configurationParameters;
-	private final ExtensionRegistry extensionRegistry;
+	private final MutableExtensionRegistry extensionRegistry;
 
-	public JmhRunner(ConfigurationParameters configurationParameters, ExtensionRegistry extensionRegistry) {
+	public JmhRunner(ConfigurationParameters configurationParameters, MutableExtensionRegistry extensionRegistry) {
 		this.configurationParameters = configurationParameters;
 		this.extensionRegistry = extensionRegistry;
 	}
