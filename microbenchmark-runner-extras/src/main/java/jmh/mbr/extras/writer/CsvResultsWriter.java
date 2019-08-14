@@ -10,6 +10,7 @@
 package jmh.mbr.extras.writer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -41,19 +42,28 @@ class CsvResultsWriter implements ResultsWriter {
 			output.println("Report creation failed: " + captureStackTrace(e));
 			return;
 		}
+		try {
 
-		File file = new File(uri.substring("csv:".length()));
-		output.println(System.lineSeparator());
-		output.println("Writing result to file: " + file);
-		file.getParentFile().mkdirs();
-		if (file.getParentFile().exists()) {
-			try {
-				FileUtils.writeLines(file, Collections.singleton(report));
+			File file = new File(uri.substring("csv:".length())).getCanonicalFile();
+			output.println(System.lineSeparator());
+			output.println("Writing result to file: " + file);
+
+			File parent = file.getParentFile();
+			if (parent != null) {
+
+				parent.mkdirs();
+
+				if (parent.exists()) {
+					FileUtils.writeLines(file, Collections.singleton(report));
+					return;
+				}
 			}
-			catch (IOException e) {
-				output.println("Write failed: " + e
-						.getMessage() + " " + captureStackTrace(e));
-			}
+
+			throw new FileNotFoundException("Parent directory " + parent + " does not exist");
+		}
+		catch (IOException e) {
+			output.println("Write failed: " + e
+					.getMessage() + " " + captureStackTrace(e));
 		}
 	}
 
