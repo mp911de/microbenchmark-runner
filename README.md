@@ -3,7 +3,7 @@ Microbenchmark Runner
 
 [![](https://jitpack.io/v/mp911de/microbenchmark-runner.svg)](https://jitpack.io/#mp911de/microbenchmark-runner) [![Build Status](https://travis-ci.org/mp911de/microbenchmark-runner.svg?branch=master)](https://travis-ci.org/mp911de/microbenchmark-runner)
 
-Microbenchmark Runner is a JUnit (JUnit 4.12/JUnit 5.3) extension to launch JMH benchmarks using JUnit directly by using existing JUnit integrations.
+Microbenchmark Runner is a JUnit (JUnit 4.12/JUnit 5.5) extension to launch JMH benchmarks using JUnit directly by using existing JUnit integrations.
 
 ### Microbenchmark Runner is and what it isn't
 
@@ -35,7 +35,7 @@ public class SimpleBenchmark {
 
 Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. 
 
-### JUnit 5.3.x
+### JUnit 5.5.x
 
 ```java
 @Microbenchmark
