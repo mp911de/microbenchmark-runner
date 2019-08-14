@@ -169,7 +169,8 @@ public class JmhSupport {
 		}
 
 		if (measurementTime > 0) {
-			optionsBuilder = optionsBuilder.measurementTime(TimeValue.seconds(measurementTime));
+			optionsBuilder = optionsBuilder
+					.measurementTime(TimeValue.seconds(measurementTime));
 		}
 
 		return optionsBuilder;
@@ -233,13 +234,15 @@ public class JmhSupport {
 			return optionsBuilder;
 		}
 
-		String reportFilePath = reportDir + (reportDir.endsWith(File.separator) ? "" : File.separator)
+		String reportFilePath = reportDir + (reportDir
+				.endsWith(File.separator) ? "" : File.separator)
 				+ reportFilename(jmhTestClass);
 		File file = new File(reportFilePath);
 
 		if (file.exists()) {
 			file.delete();
-		} else {
+		}
+		else {
 
 			file.getParentFile().mkdirs();
 			file.createNewFile();
@@ -263,9 +266,10 @@ public class JmhSupport {
 		String[] split;
 		if (uris != null) {
 			split = uris.split(",");
-		} else {
+		}
+		else {
 			// If not specified we pass in null so the result writer has a chance
-			split = new String[] { "" };
+			split = new String[] {""};
 		}
 		for (String uri : split) {
 			try {
@@ -273,8 +277,11 @@ public class JmhSupport {
 				if (writer != null) {
 					writer.write(output, results);
 				}
-			} catch (Exception e) {
-				System.err.println(String.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
+			}
+			catch (Exception e) {
+				System.err.println(String
+						.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
+				e.printStackTrace();
 			}
 		}
 	}
@@ -291,18 +298,23 @@ public class JmhSupport {
 		if (options.getOutput().hasValue()) {
 			try {
 				out = new PrintStream(options.getOutput().get());
-			} catch (FileNotFoundException ex) {
+			}
+			catch (FileNotFoundException ex) {
 				throw new IllegalStateException(ex);
 			}
-		} else {
+		}
+		else {
 			// Protect the System.out from accidental closing
 			try {
-				out = new UnCloseablePrintStream(System.out, Utils.guessConsoleEncoding());
-			} catch (UnsupportedEncodingException ex) {
+				out = new UnCloseablePrintStream(System.out, Utils
+						.guessConsoleEncoding());
+			}
+			catch (UnsupportedEncodingException ex) {
 				throw new IllegalStateException(ex);
 			}
 		}
 
-		return OutputFormatFactory.createFormatInstance(out, options.verbosity().orElse(Defaults.VERBOSITY));
+		return OutputFormatFactory.createFormatInstance(out, options.verbosity()
+				.orElse(Defaults.VERBOSITY));
 	}
 }

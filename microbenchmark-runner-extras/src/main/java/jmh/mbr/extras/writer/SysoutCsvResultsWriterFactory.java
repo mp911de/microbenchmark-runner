@@ -13,19 +13,18 @@ import jmh.mbr.core.ResultsWriter;
 import jmh.mbr.core.ResultsWriterFactory;
 
 /**
- * A {@link ResultsWriterFactory} that writes the output in csv format (to the console and to a file). Activated with
- * <code>-DpublishTo=csv:./path/to/file.csv</code>. The file will be overwritten if it already exists. If the file
- * cannot be written a warning will be printed on the console.
+ * A {@link ResultsWriterFactory} that writes the output in csv format (to the console). Activated with
+ * <code>-DpublishTo=sysout</code>.
  */
-public class CsvResultsWriterFactory implements ResultsWriterFactory {
+public class SysoutCsvResultsWriterFactory implements ResultsWriterFactory {
 
 	@Override
 	public ResultsWriter forUri(String uri) {
 
-		if (!uri.startsWith("csv:")) {
-			return null;
+		if (uri == null || uri.trim().isEmpty() || uri.equals("sysout")) {
+			return new SysoutCsvResultsWriter(uri);
 		}
 
-		return new CsvResultsWriter(uri);
+		return null;
 	}
 }
