@@ -11,13 +11,14 @@ package jmh.mbr.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import lombok.SneakyThrows;
+import jmh.mbr.core.model.BenchmarkResults;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatFactory;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -36,23 +37,8 @@ public interface ResultsWriter {
 	 * @param output original {@link OutputFormat} to append further details or failures that occurred while writing results.
 	 * @param results can be {@literal null}.
 	 */
-	void write(OutputFormat output, Collection<RunResult> results);
+	void write(OutputFormat output, BenchmarkResults results);
 
-	/**
-	 * Convert {@link RunResult}s to JMH Json representation.
-	 *
-	 * @param results
-	 * @return json string representation of results.
-	 * @see org.openjdk.jmh.results.format.JSONResultFormat
-	 */
-	@SneakyThrows
-	static String jsonifyResults(Collection<RunResult> results) {
-
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ResultFormatFactory.getInstance(ResultFormatType.JSON, new PrintStream(baos, true, "UTF-8")).writeOut(results);
-
-		return new String(baos.toByteArray(), StandardCharsets.UTF_8);
-	}
 
 	/**
 	 * Creates a {@link ResultsWriter} given a {@code uri}. This method considers {@link ResultsWriter} plugins provided by {@link ResultsWriterFactory} via Java's {@link ServiceLoader} mechanism. Returns {@literal null} if no applicable {@link ResultsWriter} was found.
@@ -88,7 +74,7 @@ class CompositeResultsWriter implements ResultsWriter {
 	}
 
 	@Override
-	public void write(OutputFormat output, Collection<RunResult> results) {
+	public void write(OutputFormat output, BenchmarkResults results) {
 		for (ResultsWriter writer : writers) {
 			writer.write(output, results);
 		}

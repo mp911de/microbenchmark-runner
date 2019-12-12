@@ -9,15 +9,22 @@
  */
 package jmh.mbr.junit5.execution;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import jmh.mbr.core.model.BenchmarkClass;
 import jmh.mbr.core.model.BenchmarkDescriptor;
 import jmh.mbr.core.model.BenchmarkDescriptorFactory;
 import jmh.mbr.core.model.BenchmarkMethod;
+import jmh.mbr.core.model.BenchmarkResults;
+import jmh.mbr.junit5.JmhRunnerStub;
 import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
@@ -33,15 +40,14 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.reporting.ReportEntry;
 import org.openjdk.jmh.annotations.Benchmark;
 
-import static org.assertj.core.api.Assertions.*;
-
 /**
  * Unit tests for {@link JmhRunner}.
  */
 public class JmhRunnerUnitTests {
 
-	JmhRunner runner = new JmhRunner(EmptyConfigurationParameters.INSTANCE, MutableExtensionRegistry
-			.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE)));
+	JmhRunnerStub runner = new JmhRunnerStub(EmptyConfigurationParameters.INSTANCE, MutableExtensionRegistry
+			.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE))) {
+	};
 
 	@Test
 	void shouldIncludeUnconditionalBenchmarkClass() {
@@ -53,7 +59,7 @@ public class JmhRunnerUnitTests {
 				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
 		assertThat(includePatterns).hasSize(1).contains(Pattern
-				.quote(SimpleBenchmarkClass.class.getName()) + "\\." + Pattern
+				.quote(SimpleBenchmarkClass.class.getName().replace('$', '.')) + "\\." + Pattern
 				.quote("justOne") + "$");
 	}
 
@@ -69,7 +75,7 @@ public class JmhRunnerUnitTests {
 				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
 		assertThat(includePatterns).hasSize(1).contains(Pattern
-				.quote(SimpleBenchmarkClass.class.getName()) + "\\." + Pattern
+				.quote(SimpleBenchmarkClass.class.getName().replace('$', '.')) + "\\." + Pattern
 				.quote("justOne") + "$");
 	}
 
@@ -83,7 +89,7 @@ public class JmhRunnerUnitTests {
 				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
 		assertThat(includePatterns).hasSize(1).contains(Pattern
-				.quote(ConditionalMethods.class.getName()) + "\\." + Pattern
+				.quote(ConditionalMethods.class.getName().replace('$', '.')) + "\\." + Pattern
 				.quote("enabled") + "$");
 	}
 
@@ -98,6 +104,28 @@ public class JmhRunnerUnitTests {
 
 		assertThat(includePatterns).isEmpty();
 	}
+
+	@Test
+	public void xxx() {
+
+		CapturingConfigurationParameters parameters = new CapturingConfigurationParameters(Collections.singletonMap("jmh.mbr.project", "my beloved one!"));
+
+		JmhRunnerStub runner = new JmhRunnerStub(parameters, MutableExtensionRegistry
+				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE))) {
+		};
+
+		runner.onRunReturnEmptyResult();
+		runner.execute(SimpleBenchmarkClass.class);
+
+		System.out.println(runner.getRunData());
+		BenchmarkResults results = runner.getResult();
+
+		System.out.println(results.getMetaData());
+
+		parameters.verifyKeyRequested("jmh.mbr.project", "jmh.mbr.project.version");
+		assertThat(results.getMetaData().getProject()).isEqualTo("my beloved one!");
+	}
+
 
 	private BenchmarkClassDescriptor createDescriptor(Class<?> javaClass) {
 
@@ -144,6 +172,49 @@ public class JmhRunnerUnitTests {
 
 		@Benchmark
 		public void enabled() {
+		}
+	}
+
+	static class CapturingConfigurationParameters implements ConfigurationParameters {
+
+		List<String> capturedKeys = new ArrayList<>();
+		private Function<String, String> callback;
+
+		public CapturingConfigurationParameters(Map<String, String> map) {
+			this(map::get);
+		}
+
+		public CapturingConfigurationParameters(Function<String, String> callback) {
+			this.callback = callback;
+		}
+
+		@Override
+		public Optional<String> get(String key) {
+			capturedKeys.add(key);
+			return Optional.ofNullable(callback.apply(key));
+		}
+
+		@Override
+		public Optional<Boolean> getBoolean(String key) {
+			return get(key).map(Boolean::parseBoolean);
+		}
+
+		@Override
+		public int size() {
+			return 1;
+		}
+
+		public void verifyKeyRequested(String... keys) {
+
+			for (String key : keys) {
+				assertThat(capturedKeys.contains(key)).withFailMessage("Expected key '%s' to be requested at least once.", key).isTrue();
+			}
+		}
+
+		public void verifyKeyRequested(String key, long times) {
+
+			long count = capturedKeys.stream().filter(key::equals).count();
+			assertThat(count).withFailMessage("Expected key '%s' to be requested exactly %s times. But was %s.", key, times, count).isEqualTo(times);
 		}
 	}
 

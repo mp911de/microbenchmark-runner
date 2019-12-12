@@ -9,9 +9,6 @@
  */
 package jmh.mbr.core.model;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -40,16 +37,25 @@ class BenchmarkParameters {
 		return argumentMap.values();
 	}
 
-	@Data
-	@RequiredArgsConstructor
 	static class BenchmarkArgument {
 
 		final String name;
 		final Set<String> parameters = new LinkedHashSet<>();
 
+		public BenchmarkArgument(String name) {
+			this.name = name;
+		}
+
 		int getParameterCount() {
 			return parameters.size();
 		}
-	}
 
+		Set<String> getParameters() {
+			return parameters;
+		}
+
+		String getName() {
+			return name;
+		}
+	}
 }

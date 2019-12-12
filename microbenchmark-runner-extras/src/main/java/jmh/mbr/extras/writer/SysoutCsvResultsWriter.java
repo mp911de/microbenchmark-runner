@@ -11,10 +11,9 @@ package jmh.mbr.extras.writer;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collection;
 
 import jmh.mbr.core.ResultsWriter;
-import org.openjdk.jmh.results.RunResult;
+import jmh.mbr.core.model.BenchmarkResults;
 import org.openjdk.jmh.runner.format.OutputFormat;
 
 class SysoutCsvResultsWriter implements ResultsWriter {
@@ -26,14 +25,13 @@ class SysoutCsvResultsWriter implements ResultsWriter {
 	}
 
 	@Override
-	public void write(OutputFormat output, Collection<RunResult> results) {
+	public void write(OutputFormat output, BenchmarkResults results) {
 
 		try {
-			String report = CsvResultsFormatter.createReport(results);
 
+			String report = CsvResultsFormatter.createReport(results.getRawResults());
 			output.println(report);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 
 			StringWriter trace = new StringWriter();
 			e.printStackTrace(new PrintWriter(trace));

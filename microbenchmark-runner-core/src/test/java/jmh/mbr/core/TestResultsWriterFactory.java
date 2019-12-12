@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import jmh.mbr.core.model.BenchmarkResults;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.format.OutputFormat;
 
@@ -33,7 +34,7 @@ public class TestResultsWriterFactory implements ResultsWriterFactory {
 	static class TestResultsWriter implements ResultsWriter {
 
 		@Override
-		public void write(OutputFormat output, Collection<RunResult> results) {
+		public void write(OutputFormat output, BenchmarkResults results) {
 		}
 	}
 }

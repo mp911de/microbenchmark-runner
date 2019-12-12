@@ -9,6 +9,8 @@
  */
 package jmh.mbr.extras.writer;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -18,6 +20,8 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import jmh.mbr.core.ResultsWriter;
+import jmh.mbr.core.model.BenchmarkResults;
+import jmh.mbr.core.model.BenchmarkResults.MetaData;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.infra.BenchmarkParams;
@@ -32,8 +36,6 @@ import org.openjdk.jmh.runner.format.OutputFormatFactory;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.openjdk.jmh.runner.options.VerboseMode;
 import org.openjdk.jmh.util.ScoreFormatter;
-
-import static org.assertj.core.api.Assertions.*;
 
 class SysoutResultsWriterFactoryTests {
 
@@ -123,7 +125,7 @@ class SysoutResultsWriterFactoryTests {
 				workload.put(key, value, i);
 			}
 		}
-		return new BenchmarkParams("com.example.Foo.exec", "bar", true, 1, new int[] {1}, Collections
+		return new BenchmarkParams("com.example.Foo.exec", "bar", true, 1, new int[]{1}, Collections
 				.singletonList("thread"), 1, 0,
 				null, null, Mode.AverageTime, workload, TimeUnit.MILLISECONDS, 1, "", Collections
 				.emptyList(), "1.8", "JDK",
@@ -143,7 +145,7 @@ class SysoutResultsWriterFactoryTests {
 		OutputStream stream = new ByteArrayOutputStream();
 		OutputFormat output = OutputFormatFactory
 				.createFormatInstance(new PrintStream(stream), VerboseMode.NORMAL);
-		factory.forUri("sysout").write(output, Arrays.asList(runResult));
+		factory.forUri("sysout").write(output, new BenchmarkResults(MetaData.none(), Arrays.asList(runResult)));
 		return stream.toString();
 	}
 }

@@ -9,8 +9,6 @@
  */
 package jmh.mbr.core.model;
 
-import lombok.RequiredArgsConstructor;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,10 +23,13 @@ import org.openjdk.jmh.annotations.State;
 /**
  * Value object to encapsulate a JMH {@code @State} class.
  */
-@RequiredArgsConstructor
 class StateClass {
 
 	private final Class<?> stateClass;
+
+	public StateClass(Class<?> stateClass) {
+		this.stateClass = stateClass;
+	}
 
 	/**
 	 * Create a {@link StateClass} given {@link Class}.
@@ -70,7 +71,7 @@ class StateClass {
 
 		if (annotation != null
 				&& (annotation.value().length == 0
-						|| (annotation.value().length == 1 && annotation.value()[0].equals(Param.BLANK_ARGS)))
+				|| (annotation.value().length == 1 && annotation.value()[0].equals(Param.BLANK_ARGS)))
 				&& field.getType().isEnum()) {
 			return Arrays.asList(field.getType().getEnumConstants()).stream().map(Object::toString)
 					.collect(Collectors.toList());

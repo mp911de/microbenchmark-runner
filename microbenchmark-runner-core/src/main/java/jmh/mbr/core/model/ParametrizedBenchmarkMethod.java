@@ -9,15 +9,12 @@
  */
 package jmh.mbr.core.model;
 
-import lombok.EqualsAndHashCode;
-
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
  * Represents a parametrized benchmark method along with the actual {@link BenchmarkFixture fixtures}.
  */
-@EqualsAndHashCode(callSuper = true)
 public class ParametrizedBenchmarkMethod extends HierarchicalBenchmarkDescriptor implements MethodAware {
 
 	ParametrizedBenchmarkMethod(BenchmarkMethod descriptor, List<BenchmarkFixture> children) {
@@ -42,5 +39,15 @@ public class ParametrizedBenchmarkMethod extends HierarchicalBenchmarkDescriptor
 	@Override
 	public boolean isUnderlyingMethod(Method method) {
 		return getDescriptor().isUnderlyingMethod(method);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
 	}
 }

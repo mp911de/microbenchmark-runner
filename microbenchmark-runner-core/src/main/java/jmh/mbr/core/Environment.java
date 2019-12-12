@@ -9,12 +9,43 @@
  */
 package jmh.mbr.core;
 
+import java.time.Duration;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Properties;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import jmh.mbr.core.BenchmarkConfigProperties.ConfigProperty;
 
 /**
  * Utility to obtain property values from System properties and environment variables.
  */
 public class Environment {
+
+	private static final Predicate<Entry<?, ?>> CONFIG_PROPERTY_FILTER = it -> it.getKey().toString().startsWith(BenchmarkConfigProperties.PREFIX);
+
+	/**
+	 * @return the {@literal os.name}.
+	 */
+	public static String getOsName() {
+		return getProperty("os.name", "n/a");
+	}
+
+	/**
+	 * @return a {@link Map} containing all configuration properties prefixed with {@link BenchmarkConfigProperties#PREFIX}.
+	 */
+	public static Map<String, Object> jmhConfigProperties() {
+
+		Properties properties = new Properties();
+		properties.putAll(filter(System.getenv()));
+		properties.putAll(filter(System.getProperties()));
+
+		return properties.entrySet()
+				.stream()
+				.collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue()));
+	}
 
 	/**
 	 * Retrieve a property value by its {@code propertyName}. Attempts to read the property from system properties first
@@ -27,12 +58,70 @@ public class Environment {
 
 		Objects.requireNonNull(propertyName, "PropertyName must not be null!");
 
-		String value = System.getProperty(propertyName);
+		return obtainPropertyValue(new ConfigProperty<>(null, propertyName));
+	}
+
+	/**
+	 * Get the value of the given {@link ConfigProperty} or its {@link ConfigProperty#defaultValue() default value}.
+	 *
+	 * @param configProperty must not be {@literal null}.
+	 * @param <T> the properties target type.
+	 * @return {@literal null} when not set.
+	 * @throws NullPointerException if required {@literal configProperty} argument is {@literal null}.
+	 */
+	static <T> T getPropertyOrDefault(ConfigProperty<T> configProperty) {
+
+		Objects.requireNonNull(configProperty, "ConfigProperty must not be null!");
+
+		String value = obtainPropertyValue(configProperty);
 
 		if (StringUtils.isEmpty(value)) {
-			return System.getenv(propertyName);
+			return configProperty.defaultValue();
 		}
-		return value;
+
+		Class<T> targetType = configProperty.getType();
+
+		if (targetType == Object.class) {
+			return (T) value;
+		}
+		if (targetType == String.class) {
+			return targetType.cast(value);
+		}
+		if (targetType == Boolean.class) {
+			return targetType.cast(Boolean.valueOf(value));
+		}
+		if (Long.class.isAssignableFrom(targetType)) {
+			return targetType.cast(Long.parseLong(value));
+		}
+		if (Duration.class.isAssignableFrom(targetType)) {
+			return targetType.cast(Duration.ofSeconds(Long.parseLong(value)));
+		}
+
+		return (T) value;
+	}
+
+	private static Map<Object, Object> filter(Map<?, ?> source) {
+
+		return source.entrySet()
+				.stream()
+				.filter(CONFIG_PROPERTY_FILTER)
+				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+	}
+
+	private static <T> String obtainPropertyValue(ConfigProperty<T> configProperty) {
+
+		for (String propertyName : configProperty.propertyNames()) {
+
+			if (System.getProperties().containsKey(propertyName)) {
+				return System.getProperty(propertyName);
+			}
+
+			if (System.getenv().containsKey(propertyName)) {
+				return System.getenv(propertyName);
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -47,13 +136,7 @@ public class Environment {
 	public static String getProperty(String propertyName, String defaultValue) {
 
 		Objects.requireNonNull(propertyName, "PropertyName must not be null!");
-
-		String value = getProperty(propertyName);
-		if (StringUtils.isEmpty(value)) {
-			return defaultValue;
-		}
-
-		return value;
+		return obtainPropertyValue(new ConfigProperty<>(defaultValue, propertyName));
 	}
 
 	/**

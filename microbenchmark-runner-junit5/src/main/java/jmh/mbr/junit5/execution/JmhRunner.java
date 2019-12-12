@@ -26,9 +26,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jmh.mbr.core.Environment;
+import jmh.mbr.core.BenchmarkConfiguration;
 import jmh.mbr.core.JmhSupport;
 import jmh.mbr.core.StringUtils;
+import jmh.mbr.core.model.BenchmarkResults;
+import jmh.mbr.core.model.BenchmarkResults.MetaData;
 import jmh.mbr.core.model.MethodAware;
 import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
@@ -72,7 +74,8 @@ public class JmhRunner {
 
 	public void execute(TestDescriptor testDescriptor, EngineExecutionListener listener) {
 
-		JmhSupport support = new JmhSupport();
+		BenchmarkConfiguration jmhOptions = new ConfigurationParameterBenchmarkConfiguration(configurationParameters);
+		JmhSupport support = initJmhSupport(jmhOptions);
 
 		ChainedOptionsBuilder optionsBuilder = support.options();
 
@@ -93,17 +96,25 @@ public class JmhRunner {
 		includePatterns.forEach(optionsBuilder::include);
 
 		CacheFunction cache = new CacheFunction(methods);
-		Options options = optionsBuilder.build();
+		Options runOptions = optionsBuilder.build();
 		NotifyingOutputFormat notifyingOutputFormat = new NotifyingOutputFormat(listener, cache,
-				support.createOutputFormat(options));
+				support.createOutputFormat(runOptions));
 
 		try {
 			listener.executionStarted(testDescriptor);
-			support.publishResults(notifyingOutputFormat, new Runner(options, notifyingOutputFormat).run());
+			support.publishResults(notifyingOutputFormat, new BenchmarkResults(MetaData.from(jmhOptions.asMap()), runBenchmarks(runOptions, notifyingOutputFormat)));
 			listener.executionFinished(testDescriptor, TestExecutionResult.successful());
 		} catch (RunnerException e) {
 			listener.executionFinished(testDescriptor, TestExecutionResult.failed(e));
 		}
+	}
+
+	protected Collection<RunResult> runBenchmarks(Options options, OutputFormat outputFormat) throws RunnerException {
+		return new Runner(options, outputFormat).run();
+	}
+
+	protected JmhSupport initJmhSupport(BenchmarkConfiguration parameters) {
+		return new JmhSupport(parameters);
 	}
 
 	private List<AbstractBenchmarkDescriptor> collectBenchmarkMethods(TestDescriptor testDescriptor) {
@@ -127,7 +138,7 @@ public class JmhRunner {
 	@SuppressWarnings("unchecked")
 	private List<AbstractBenchmarkDescriptor> getIncludes(TestDescriptor testDescriptor) {
 
-		String tests = Environment.getProperty("benchmark");
+		String tests = configurationParameters.get("benchmark").orElse(null);
 
 		List<BenchmarkClassDescriptor> classes = new ArrayList<>();
 
@@ -163,7 +174,7 @@ public class JmhRunner {
 		}).map(AbstractBenchmarkDescriptor.class::cast).collect(Collectors.toList());
 	}
 
-	List<String> evaluateBenchmarksToRun(List<AbstractBenchmarkDescriptor> includes, EngineExecutionListener listener) {
+	protected List<String> evaluateBenchmarksToRun(List<AbstractBenchmarkDescriptor> includes, EngineExecutionListener listener) {
 
 		try (ExtensionContextProvider contextProvider = ExtensionContextProvider.create(listener, configurationParameters)) {
 
@@ -245,7 +256,7 @@ public class JmhRunner {
 		public void includeIfEnabled(List<String> includePatterns) {
 			if (!skipResult.isSkipped()) {
 				Method method = methodAware.getMethod();
-				includePatterns.add(Pattern.quote(method.getDeclaringClass().getName()) + "\\." + Pattern.quote(method.getName()) + "$");
+				includePatterns.add(Pattern.quote(method.getDeclaringClass().getName().replace('$', '.')) + "\\." + Pattern.quote(method.getName()) + "$");
 			}
 		}
 	}
@@ -278,7 +289,7 @@ public class JmhRunner {
 
 		@Override
 		public void iterationResult(BenchmarkParams benchParams, IterationParams params, int iteration,
-									IterationResult data) {
+				IterationResult data) {
 			delegate.iterationResult(benchParams, params, iteration, data);
 		}
 
@@ -500,7 +511,7 @@ public class JmhRunner {
 		private String getBenchmarkName(TestDescriptor descriptor) {
 
 			MethodAware methodAware = (MethodAware) descriptor;
-			return methodAware.getMethod().getDeclaringClass().getName() + "." + methodAware.getMethod().getName();
+			return methodAware.getMethod().getDeclaringClass().getName().replace('$', '.') + "." + methodAware.getMethod().getName();
 		}
 	}
 }
