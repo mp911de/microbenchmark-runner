@@ -9,3 +9,4 @@
 #
 jmh.mbr.extras.writer.CsvResultsWriterFactory
 jmh.mbr.extras.writer.SysoutCsvResultsWriterFactory
+jmh.mbr.extras.writer.ElasticserachResultsWriterFactory

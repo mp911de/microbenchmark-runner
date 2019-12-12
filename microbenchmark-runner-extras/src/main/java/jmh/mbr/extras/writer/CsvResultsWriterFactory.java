@@ -14,7 +14,7 @@ import jmh.mbr.core.ResultsWriterFactory;
 
 /**
  * A {@link ResultsWriterFactory} that writes the output in csv format (to the console and to a file). Activated with
- * <code>-DpublishTo=csv:./path/to/file.csv</code>. The file will be overwritten if it already exists. If the file
+ * <code>-Djmh.mbr.report.publishTo=csv:./path/to/file.csv</code>. The file will be overwritten if it already exists. If the file
  * cannot be written a warning will be printed on the console.
  */
 public class CsvResultsWriterFactory implements ResultsWriterFactory {

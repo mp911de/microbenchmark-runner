@@ -14,11 +14,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collection;
 import java.util.Collections;
 
 import jmh.mbr.core.ResultsWriter;
-import org.openjdk.jmh.results.RunResult;
+import jmh.mbr.core.model.BenchmarkResults;
 import org.openjdk.jmh.runner.format.OutputFormat;
 import org.openjdk.jmh.util.FileUtils;
 
@@ -31,12 +30,12 @@ class CsvResultsWriter implements ResultsWriter {
 	}
 
 	@Override
-	public void write(OutputFormat output, Collection<RunResult> results) {
+	public void write(OutputFormat output, BenchmarkResults results) {
 
 		String report;
 
 		try {
-			report = CsvResultsFormatter.createReport(results);
+			report = CsvResultsFormatter.createReport(results.getRawResults());
 		}
 		catch (Exception e) {
 			output.println("Report creation failed: " + captureStackTrace(e));

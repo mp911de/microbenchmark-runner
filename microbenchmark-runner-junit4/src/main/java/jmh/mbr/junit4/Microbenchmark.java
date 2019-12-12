@@ -31,6 +31,18 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import jmh.mbr.core.Environment;
+import jmh.mbr.core.BenchmarkConfiguration;
+import jmh.mbr.core.JmhSupport;
+import jmh.mbr.core.StringUtils;
+import jmh.mbr.core.model.BenchmarkClass;
+import jmh.mbr.core.model.BenchmarkDescriptor;
+import jmh.mbr.core.model.BenchmarkDescriptorFactory;
+import jmh.mbr.core.model.BenchmarkFixture;
+import jmh.mbr.core.model.BenchmarkMethod;
+import jmh.mbr.core.model.BenchmarkResults;
+import jmh.mbr.core.model.BenchmarkResults.MetaData;
+import jmh.mbr.core.model.HierarchicalBenchmarkDescriptor;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
@@ -58,16 +70,6 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.util.UnCloseablePrintStream;
 import org.openjdk.jmh.util.Utils;
 
-import jmh.mbr.core.Environment;
-import jmh.mbr.core.JmhSupport;
-import jmh.mbr.core.StringUtils;
-import jmh.mbr.core.model.BenchmarkClass;
-import jmh.mbr.core.model.BenchmarkDescriptor;
-import jmh.mbr.core.model.BenchmarkDescriptorFactory;
-import jmh.mbr.core.model.BenchmarkFixture;
-import jmh.mbr.core.model.BenchmarkMethod;
-import jmh.mbr.core.model.HierarchicalBenchmarkDescriptor;
-
 /**
  * JMH Microbenchmark runner that turns methods annotated with {@link Benchmark} into runnable methods allowing
  * execution through JUnit.
@@ -80,7 +82,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 	private final Map<String, Description> fixtureMethodDescriptions = new LinkedHashMap<>();
 
 	private final Object childrenLock = new Object();
-	private final JmhSupport jmhRunner = new JmhSupport();
+	private final JmhSupport jmhRunner = new JmhSupport(BenchmarkConfiguration.defaultOptions());
 	private final BenchmarkClass benchmarkClass;
 
 	private Collection<BenchmarkDescriptor> filteredChildren;
@@ -118,7 +120,8 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 	 * @param errors
 	 */
 	@Override
-	protected void collectInitializationErrors(List<Throwable> errors) {}
+	protected void collectInitializationErrors(List<Throwable> errors) {
+	}
 
 	@Override
 	protected List<BenchmarkDescriptor> getChildren() {
@@ -256,7 +259,8 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 	}
 
 	@Override
-	protected void runChild(BenchmarkDescriptor child, RunNotifier notifier) {}
+	protected void runChild(BenchmarkDescriptor child, RunNotifier notifier) {
+	}
 
 	/**
 	 * Run matching {@link org.openjdk.jmh.annotations.Benchmark} methods.
@@ -273,7 +277,8 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 		if (methods.isEmpty()) {
 			return new Statement() {
 				@Override
-				public void evaluate() {}
+				public void evaluate() {
+				}
 			};
 		}
 
@@ -312,7 +317,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 		NotifyingOutputFormat notifyingOutputFormat = new NotifyingOutputFormat(notifier, cache,
 				createOutputFormat(options));
 
-		jmhRunner.publishResults(notifyingOutputFormat, new Runner(options, notifyingOutputFormat).run());
+		jmhRunner.publishResults(notifyingOutputFormat, new BenchmarkResults(MetaData.from(Environment.jmhConfigProperties()), new Runner(options, notifyingOutputFormat).run()));
 	}
 
 	/**
@@ -321,7 +326,7 @@ public class Microbenchmark extends ParentRunner<BenchmarkDescriptor> implements
 	 * The {@literal benchmark} command line argument allows overriding the defaults using {@code #} as class / method
 	 * name separator.
 	 *
-	 * @param name
+	 * @param testClass
 	 * @param methods
 	 * @return never {@literal null}.
 	 */

@@ -9,7 +9,6 @@
  */
 package jmh.mbr.core.model;
 
-import lombok.EqualsAndHashCode;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -18,7 +17,6 @@ import java.util.Map;
 /**
  * Represents a parametrized fixture.
  */
-@EqualsAndHashCode
 public class BenchmarkFixture implements BenchmarkDescriptor {
 
 	private final Map<String, Object> fixture;
@@ -75,5 +73,20 @@ public class BenchmarkFixture implements BenchmarkDescriptor {
 		sb.append(getClass().getSimpleName());
 		sb.append(fixture);
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		BenchmarkFixture that = (BenchmarkFixture) o;
+
+		return fixture != null ? fixture.equals(that.fixture) : that.fixture == null;
+	}
+
+	@Override
+	public int hashCode() {
+		return fixture != null ? fixture.hashCode() : 0;
 	}
 }

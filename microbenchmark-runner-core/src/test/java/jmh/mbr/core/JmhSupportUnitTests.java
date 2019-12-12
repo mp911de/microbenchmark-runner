@@ -9,10 +9,14 @@
  */
 package jmh.mbr.core;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import jmh.mbr.core.model.BenchmarkResults;
+import jmh.mbr.core.model.BenchmarkResults.MetaData;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.IterationParams;
@@ -20,8 +24,6 @@ import org.openjdk.jmh.results.BenchmarkResult;
 import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.format.OutputFormat;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link JmhSupport}.
@@ -34,14 +36,14 @@ class JmhSupportUnitTests {
 		TestResultsWriterFactory.REGISTRY.put("foo", FooResultWriter::new);
 		TestResultsWriterFactory.REGISTRY.put("bar", BarResultWriter::new);
 
-		System.setProperty("publishTo", "foo,bar,none");
+		System.setProperty("jmh.mbr.report.publishTo", "foo,bar,none");
 
 		try {
-			JmhSupport support = new JmhSupport();
+			JmhSupport support = new JmhSupport(BenchmarkConfiguration.defaultOptions());
 			RunResult runResult = new RunResult(null, Collections.emptyList());
-			support.publishResults(SilentOutputFormat.INSTANCE, Collections.singleton(runResult));
+			support.publishResults(SilentOutputFormat.INSTANCE, new BenchmarkResults(MetaData.none(), Collections.singleton(runResult)));
 		} finally {
-			System.clearProperty("publishTo");
+			System.clearProperty("jmh.mbr.report.publishTo");
 			TestResultsWriterFactory.REGISTRY.remove("foo");
 			TestResultsWriterFactory.REGISTRY.remove("bar");
 		}
@@ -56,9 +58,9 @@ class JmhSupportUnitTests {
 		TestResultsWriterFactory.REGISTRY.put("", FooResultWriter::new);
 
 		try {
-			JmhSupport support = new JmhSupport();
+			JmhSupport support = new JmhSupport(BenchmarkConfiguration.defaultOptions());
 			RunResult runResult = new RunResult(null, Collections.emptyList());
-			support.publishResults(SilentOutputFormat.INSTANCE, Collections.singleton(runResult));
+			support.publishResults(SilentOutputFormat.INSTANCE, new BenchmarkResults(MetaData.none(), Collections.singleton(runResult)));
 		} finally {
 			TestResultsWriterFactory.REGISTRY.remove("");
 		}
@@ -71,7 +73,7 @@ class JmhSupportUnitTests {
 		static boolean written = false;
 
 		@Override
-		public void write(OutputFormat output, Collection<RunResult> results) {
+		public void write(OutputFormat output, BenchmarkResults results) {
 			written = true;
 		}
 	}
@@ -81,7 +83,7 @@ class JmhSupportUnitTests {
 		static boolean written = false;
 
 		@Override
-		public void write(OutputFormat output, Collection<RunResult> results) {
+		public void write(OutputFormat output, BenchmarkResults results) {
 			written = true;
 		}
 	}

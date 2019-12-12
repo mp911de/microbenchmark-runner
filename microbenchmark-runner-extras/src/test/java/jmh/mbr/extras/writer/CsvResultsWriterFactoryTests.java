@@ -16,6 +16,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 
+import jmh.mbr.core.model.BenchmarkResults;
+import jmh.mbr.core.model.BenchmarkResults.MetaData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.results.RunResult;
@@ -55,7 +57,7 @@ class CsvResultsWriterFactoryTests {
 		OutputStream stream = new ByteArrayOutputStream();
 		OutputFormat output = OutputFormatFactory
 				.createFormatInstance(new PrintStream(stream), VerboseMode.NORMAL);
-		factory.forUri("csv:" + TARGET_FILE).write(output, Arrays.asList(runResult));
+		factory.forUri("csv:" + TARGET_FILE).write(output, new BenchmarkResults(MetaData.none(), Arrays.asList(runResult)));
 		return stream.toString();
 	}
 }

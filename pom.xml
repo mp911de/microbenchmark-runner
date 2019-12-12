@@ -21,11 +21,11 @@
 		<module>microbenchmark-runner-extras</module>
 		<module>microbenchmark-runner-junit4</module>
 		<module>microbenchmark-runner-junit5</module>
+		<module>microbenchmark-runner-junit5-smoke-tests</module>
 	</modules>
 
 	<properties>
-		<jmh.version>1.21</jmh.version>
-		<lombok.version>1.18.2</lombok.version>
+		<jmh.version>1.22</jmh.version>
 		<assertj.version>3.11.1</assertj.version>
 		<junit4.version>4.12</junit4.version>
 		<junit5.version>5.5.1</junit5.version>
@@ -85,13 +85,6 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>${junit4.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>${lombok.version}</version>
-				<scope>provided</scope>
 			</dependency>
 
 			<dependency>
