@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -22,9 +22,10 @@ import jmh.mbr.core.BenchmarkConfigProperties.ConfigProperty;
 /**
  * Utility to obtain property values from System properties and environment variables.
  */
-public class Environment {
+public abstract class Environment {
 
-	private static final Predicate<Entry<?, ?>> CONFIG_PROPERTY_FILTER = it -> it.getKey().toString().startsWith(BenchmarkConfigProperties.PREFIX);
+	private static final Predicate<Entry<?, ?>> CONFIG_PROPERTY_FILTER = it -> it.getKey()
+			.toString().startsWith(BenchmarkConfigProperties.PREFIX);
 
 	/**
 	 * @return the {@literal os.name}.
@@ -81,23 +82,19 @@ public class Environment {
 
 		Class<T> targetType = configProperty.getType();
 
-		if (targetType == Object.class) {
-			return (T) value;
-		}
-		if (targetType == String.class) {
-			return targetType.cast(value);
-		}
 		if (targetType == Boolean.class) {
 			return targetType.cast(Boolean.valueOf(value));
 		}
+
 		if (Long.class.isAssignableFrom(targetType)) {
 			return targetType.cast(Long.parseLong(value));
 		}
+
 		if (Duration.class.isAssignableFrom(targetType)) {
 			return targetType.cast(Duration.ofSeconds(Long.parseLong(value)));
 		}
 
-		return (T) value;
+		return targetType.cast(value);
 	}
 
 	private static Map<Object, Object> filter(Map<?, ?> source) {
@@ -105,7 +102,7 @@ public class Environment {
 		return source.entrySet()
 				.stream()
 				.filter(CONFIG_PROPERTY_FILTER)
-				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 	}
 
 	private static <T> String obtainPropertyValue(ConfigProperty<T> configProperty) {
@@ -147,5 +144,8 @@ public class Environment {
 	 */
 	public static boolean containsProperty(String propertyName) {
 		return !StringUtils.isEmpty(getProperty(propertyName));
+	}
+
+	private Environment() {
 	}
 }

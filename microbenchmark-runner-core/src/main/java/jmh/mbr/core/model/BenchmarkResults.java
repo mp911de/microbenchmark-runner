@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jmh.mbr.core.Environment;
 import jmh.mbr.core.model.BenchmarkResults.BenchmarkResult;
@@ -28,7 +27,7 @@ import org.openjdk.jmh.results.Result;
 import org.openjdk.jmh.results.RunResult;
 
 /**
- * @author Christoph Strobl
+ * Wrapper for {@link RunResult RunResults}.
  */
 public class BenchmarkResults implements Iterable<BenchmarkResult> {
 
@@ -41,8 +40,13 @@ public class BenchmarkResults implements Iterable<BenchmarkResult> {
 		this.metaData = metaData;
 	}
 
-	public <T> List<T> flatMapMany(Function<BenchmarkResult, T> function) {
-		return runResults.stream().map(it -> function.apply(new BenchmarkResult(metaData, it))).collect(Collectors.toList());
+	/**
+	 * Obtain a {@link Stream} of {@link BenchmarkResult}.
+	 *
+	 * @return a {@link Stream} of {@link BenchmarkResult}.
+	 */
+	public Stream<BenchmarkResult> stream() {
+		return runResults.stream().map(it -> new BenchmarkResult(metaData, it));
 	}
 
 	public MetaData getMetaData() {
@@ -58,11 +62,12 @@ public class BenchmarkResults implements Iterable<BenchmarkResult> {
 
 	@Override
 	public Iterator<BenchmarkResult> iterator() {
-		return runResults.stream().map(it -> new BenchmarkResult(metaData, it)).iterator();
+		return runResults.stream().map(it -> new BenchmarkResult(metaData, it))
+				.iterator();
 	}
 
 	/**
-	 *
+	 * Wrapper for a single {@link RunResult} along with execution {@link MetaData}.
 	 */
 	public static class BenchmarkResult {
 
@@ -108,16 +113,15 @@ public class BenchmarkResults implements Iterable<BenchmarkResult> {
 
 		private String project;
 		private String version;
-		private final Instant time;
+		private Instant time;
 		private String os;
 		private Map<String, Object> additionalParameters = new LinkedHashMap<>();
 
 		private MetaData() {
-			time = Instant.now();
+			this.time = Instant.now();
 		}
 
 		public MetaData(String project, String version) {
-
 			this();
 			this.project = project;
 			this.version = version;
@@ -158,17 +162,17 @@ public class BenchmarkResults implements Iterable<BenchmarkResult> {
 			for (Entry<String, Object> entry : metadata.entrySet()) {
 
 				switch (entry.getKey()) {
-					case "os":
-						target.os = entry.getValue().toString();
-						continue;
-					case "jmh.mbr.project":
-						target.project = entry.getValue().toString();
-						continue;
-					case "jmh.mbr.project.version":
-						target.version = entry.getValue().toString();
-						continue;
-					default:
-						target.additionalParameters.put(entry.getKey(), entry.getValue());
+				case "os":
+					target.os = entry.getValue().toString();
+					continue;
+				case "jmh.mbr.project":
+					target.project = entry.getValue().toString();
+					continue;
+				case "jmh.mbr.project.version":
+					target.version = entry.getValue().toString();
+					continue;
+				default:
+					target.additionalParameters.put(entry.getKey(), entry.getValue());
 				}
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -12,8 +12,6 @@ package jmh.mbr.extras.writer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collections;
 
 import jmh.mbr.core.ResultsWriter;
@@ -38,7 +36,7 @@ class CsvResultsWriter implements ResultsWriter {
 			report = CsvResultsFormatter.createReport(results.getRawResults());
 		}
 		catch (Exception e) {
-			output.println("Report creation failed: " + captureStackTrace(e));
+			output.println("Report creation failed: " + StackTraceCapture.from(e));
 			return;
 		}
 		try {
@@ -62,14 +60,7 @@ class CsvResultsWriter implements ResultsWriter {
 		}
 		catch (IOException e) {
 			output.println("Write failed: " + e
-					.getMessage() + " " + captureStackTrace(e));
+					.getMessage() + " " + StackTraceCapture.from(e));
 		}
 	}
-
-	private String captureStackTrace(Exception e) {
-		StringWriter trace = new StringWriter();
-		e.printStackTrace(new PrintWriter(trace));
-		return trace.toString();
-	}
-
 }

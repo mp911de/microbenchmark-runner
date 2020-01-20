@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -33,6 +33,9 @@ import org.openjdk.jmh.runner.options.WarmupMode;
 import org.openjdk.jmh.util.UnCloseablePrintStream;
 import org.openjdk.jmh.util.Utils;
 
+/**
+ * Support class to configure JMH and publish {@link BenchmarkResults}.
+ */
 public class JmhSupport {
 
 	private final BenchmarkConfiguration jmhOptions;
@@ -67,18 +70,15 @@ public class JmhSupport {
 		optionsBuilder = measure(optionsBuilder);
 		optionsBuilder = forks(optionsBuilder);
 
-		{
-			Duration timeout = jmhOptions.getTimeout();
-			if (!timeout.isZero() && !timeout.isNegative()) {
-				optionsBuilder = optionsBuilder.timeout(TimeValue.seconds(timeout.getSeconds()));
-			}
+		Duration timeout = jmhOptions.getTimeout();
+		if (!timeout.isZero() && !timeout.isNegative()) {
+			optionsBuilder = optionsBuilder
+					.timeout(TimeValue.seconds(timeout.getSeconds()));
 		}
 
-		{
-			String mode = jmhOptions.getMode();
-			if (StringUtils.hasText(mode)) {
-				optionsBuilder = optionsBuilder.mode(Mode.valueOf(mode));
-			}
+		String mode = jmhOptions.getMode();
+		if (StringUtils.hasText(mode)) {
+			optionsBuilder = optionsBuilder.mode(Mode.valueOf(mode));
 		}
 
 		return optionsBuilder;
@@ -127,34 +127,28 @@ public class JmhSupport {
 	 */
 	private ChainedOptionsBuilder measure(ChainedOptionsBuilder optionsBuilder) {
 
-		{
-			int measurementIterations = jmhOptions.getMeasurementIterations();
-			if (measurementIterations > 0) {
-				optionsBuilder = optionsBuilder.measurementIterations(measurementIterations);
-			}
+		int measurementIterations = jmhOptions.getMeasurementIterations();
+		if (measurementIterations > 0) {
+			optionsBuilder = optionsBuilder
+					.measurementIterations(measurementIterations);
 		}
 
-		{
-			long measurementTime = jmhOptions.getMeasurementTime().getSeconds();
-			if (measurementTime > 0) {
-				optionsBuilder = optionsBuilder
-						.measurementTime(TimeValue.seconds(measurementTime));
-			}
+		long measurementTime = jmhOptions.getMeasurementTime().getSeconds();
+		if (measurementTime > 0) {
+			optionsBuilder = optionsBuilder
+					.measurementTime(TimeValue.seconds(measurementTime));
 		}
 
-		{
-			int measurementBatchSize = jmhOptions.getMeasurementBatchSize();
-			if (measurementBatchSize > 0) {
-				optionsBuilder = optionsBuilder
-						.measurementBatchSize(measurementBatchSize);
-			}
+		int measurementBatchSize = jmhOptions.getMeasurementBatchSize();
+		if (measurementBatchSize > 0) {
+			optionsBuilder = optionsBuilder
+					.measurementBatchSize(measurementBatchSize);
 		}
 
-		{
-			String warmupMode = jmhOptions.getWarmupMode();
-			if (StringUtils.hasText(warmupMode)) {
-				optionsBuilder = optionsBuilder.warmupMode(WarmupMode.valueOf(warmupMode));
-			}
+		String warmupMode = jmhOptions.getWarmupMode();
+		if (StringUtils.hasText(warmupMode)) {
+			optionsBuilder = optionsBuilder
+					.warmupMode(WarmupMode.valueOf(warmupMode));
 		}
 
 		return optionsBuilder;
@@ -170,25 +164,19 @@ public class JmhSupport {
 	 */
 	private ChainedOptionsBuilder warmup(ChainedOptionsBuilder optionsBuilder) {
 
-		{
-			int warmupIterations = jmhOptions.getWarmupIterations();
-			if (warmupIterations > 0) {
-				optionsBuilder = optionsBuilder.warmupIterations(warmupIterations);
-			}
+		int warmupIterations = jmhOptions.getWarmupIterations();
+		if (warmupIterations > 0) {
+			optionsBuilder = optionsBuilder.warmupIterations(warmupIterations);
 		}
 
-		{
-			long warmupTime = jmhOptions.getWarmupTime().getSeconds();
-			if (warmupTime > 0) {
-				optionsBuilder = optionsBuilder.warmupTime(TimeValue.seconds(warmupTime));
-			}
+		long warmupTime = jmhOptions.getWarmupTime().getSeconds();
+		if (warmupTime > 0) {
+			optionsBuilder = optionsBuilder.warmupTime(TimeValue.seconds(warmupTime));
 		}
 
-		{
-			int warmupBatchSize = jmhOptions.getWarmupBatchSize();
-			if (warmupBatchSize > 0) {
-				optionsBuilder = optionsBuilder.warmupBatchSize(warmupBatchSize);
-			}
+		int warmupBatchSize = jmhOptions.getWarmupBatchSize();
+		if (warmupBatchSize > 0) {
+			optionsBuilder = optionsBuilder.warmupBatchSize(warmupBatchSize);
 		}
 
 		return optionsBuilder;
@@ -235,7 +223,8 @@ public class JmhSupport {
 
 		if (file.exists()) {
 			file.delete();
-		} else {
+		}
+		else {
 
 			file.getParentFile().mkdirs();
 			file.createNewFile();
@@ -259,9 +248,10 @@ public class JmhSupport {
 		String[] split;
 		if (uris != null) {
 			split = uris.split(",");
-		} else {
+		}
+		else {
 			// If not specified we pass in null so the result writer has a chance
-			split = new String[]{""};
+			split = new String[] {""};
 		}
 		for (String uri : split) {
 			try {
@@ -269,7 +259,8 @@ public class JmhSupport {
 				if (writer != null) {
 					writer.write(output, results);
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				System.err.println(String
 						.format("Cannot save benchmark results to '%s'. Error was %s.", uri, e));
 				e.printStackTrace();
@@ -289,15 +280,18 @@ public class JmhSupport {
 		if (options.getOutput().hasValue()) {
 			try {
 				out = new PrintStream(options.getOutput().get());
-			} catch (FileNotFoundException ex) {
+			}
+			catch (FileNotFoundException ex) {
 				throw new IllegalStateException(ex);
 			}
-		} else {
+		}
+		else {
 			// Protect the System.out from accidental closing
 			try {
 				out = new UnCloseablePrintStream(System.out, Utils
 						.guessConsoleEncoding());
-			} catch (UnsupportedEncodingException ex) {
+			}
+			catch (UnsupportedEncodingException ex) {
 				throw new IllegalStateException(ex);
 			}
 		}

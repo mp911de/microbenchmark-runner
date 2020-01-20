@@ -99,13 +99,20 @@ You can configure the runner by using System Properties and Environment Variable
 * `measurementIterations` (`integer`, defaults to `-1`) Global override of measurement iterations. Uses `@Measurement` or JMH defaults if set to `-1`. 
 * `measurementTime` (`integer`, defaults to `-1`) Global override of measurement time. Uses `@Measurement` or JMH defaults if set to `-1`. 
 * `forks` (`integer`, defaults to `-1`) Global override of number of forks. Uses `@Fork` or JMH defaults if set to `-1`.
-* `publishTo` URL to configure one or more result publishers. `jmh.mbr.core.ResultsWriterFactory` implementations are discovered using the Java ServiceLoader mechanism. Bundled publishers in `microbenchmark-runner-extras` are:
-    * CSV reporting to System.out (enabled by default or with `-DpublishTo=sysout`)
-    * CSV reporting to a file (enabled with `-DpublishTo=csv:location/to/file`)
+* `publishTo` URL to configure one or more result publishers. `jmh.mbr.core.ResultsWriterFactory` implementations are discovered using the Java ServiceLoader mechanism. See `Result Writers` for further details.
 
 # Limitations
 
-Microbenchmark Runner uses JUnit infrastructure to select Benchmarks to run and JUnit's progress reporting. Benchmarks are delegated to JMH's Runner Engine for execution. In consequence, JUnit annotations such as `@Before`, `@BeforeEach`, `@BeforeAll`, and others do not have any effect as they are not considered by the execution engine.  
+Microbenchmark Runner uses JUnit infrastructure to select Benchmarks to run and JUnit's progress reporting. Benchmarks are delegated to JMH's Runner Engine for execution. In consequence, JUnit annotations such as `@Before`, `@BeforeEach`, `@BeforeAll`, and others do not have any effect as they are not considered by the execution engine.
+
+# Result Writers
+
+Microbenchmark Runner comes with pluggable support for result output. Results are published using the `jmh.mbr.core.ResultsWriterFactory` SPI.
+
+Bundled publishers in `microbenchmark-runner-extras` are:
+    * CSV reporting to System.out (enabled by default or with `-DpublishTo=sysout`)
+    * CSV reporting to a file (enabled with `-DpublishTo=csv:location/to/file`)
+    * Elasticsearch reporting (enabled with `-DpublishTo=elasticsearch://[username]:[password]@[host]:[port]/`). The index name is controlled through an external property `jmh.mbr.project`.     
 
 # Reporting Issues
 

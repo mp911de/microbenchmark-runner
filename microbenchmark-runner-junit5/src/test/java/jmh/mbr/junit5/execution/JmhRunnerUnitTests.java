@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -8,8 +8,6 @@
  * http://www.eclipse.org/legal/epl-v20.html
  */
 package jmh.mbr.junit5.execution;
-
-import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +38,8 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.reporting.ReportEntry;
 import org.openjdk.jmh.annotations.Benchmark;
 
+import static org.assertj.core.api.Assertions.*;
+
 /**
  * Unit tests for {@link JmhRunner}.
  */
@@ -59,7 +59,8 @@ public class JmhRunnerUnitTests {
 				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
 		assertThat(includePatterns).hasSize(1).contains(Pattern
-				.quote(SimpleBenchmarkClass.class.getName().replace('$', '.')) + "\\." + Pattern
+				.quote(SimpleBenchmarkClass.class.getName()
+						.replace('$', '.')) + "\\." + Pattern
 				.quote("justOne") + "$");
 	}
 
@@ -75,7 +76,8 @@ public class JmhRunnerUnitTests {
 				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
 		assertThat(includePatterns).hasSize(1).contains(Pattern
-				.quote(SimpleBenchmarkClass.class.getName().replace('$', '.')) + "\\." + Pattern
+				.quote(SimpleBenchmarkClass.class.getName()
+						.replace('$', '.')) + "\\." + Pattern
 				.quote("justOne") + "$");
 	}
 
@@ -89,7 +91,8 @@ public class JmhRunnerUnitTests {
 				.evaluateBenchmarksToRun(descriptors, EmptyEngineExecutionListener.INSTANCE);
 
 		assertThat(includePatterns).hasSize(1).contains(Pattern
-				.quote(ConditionalMethods.class.getName().replace('$', '.')) + "\\." + Pattern
+				.quote(ConditionalMethods.class.getName()
+						.replace('$', '.')) + "\\." + Pattern
 				.quote("enabled") + "$");
 	}
 
@@ -106,9 +109,10 @@ public class JmhRunnerUnitTests {
 	}
 
 	@Test
-	public void xxx() {
+	public void shouldCaptureConfigurationParameters() {
 
-		CapturingConfigurationParameters parameters = new CapturingConfigurationParameters(Collections.singletonMap("jmh.mbr.project", "my beloved one!"));
+		CapturingConfigurationParameters parameters = new CapturingConfigurationParameters(Collections
+				.singletonMap("jmh.mbr.project", "my beloved one!"));
 
 		JmhRunnerStub runner = new JmhRunnerStub(parameters, MutableExtensionRegistry
 				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE))) {
@@ -117,10 +121,7 @@ public class JmhRunnerUnitTests {
 		runner.onRunReturnEmptyResult();
 		runner.execute(SimpleBenchmarkClass.class);
 
-		System.out.println(runner.getRunData());
 		BenchmarkResults results = runner.getResult();
-
-		System.out.println(results.getMetaData());
 
 		parameters.verifyKeyRequested("jmh.mbr.project", "jmh.mbr.project.version");
 		assertThat(results.getMetaData().getProject()).isEqualTo("my beloved one!");
@@ -207,14 +208,18 @@ public class JmhRunnerUnitTests {
 		public void verifyKeyRequested(String... keys) {
 
 			for (String key : keys) {
-				assertThat(capturedKeys.contains(key)).withFailMessage("Expected key '%s' to be requested at least once.", key).isTrue();
+				assertThat(capturedKeys.contains(key))
+						.withFailMessage("Expected key '%s' to be requested at least once.", key)
+						.isTrue();
 			}
 		}
 
 		public void verifyKeyRequested(String key, long times) {
 
 			long count = capturedKeys.stream().filter(key::equals).count();
-			assertThat(count).withFailMessage("Expected key '%s' to be requested exactly %s times. But was %s.", key, times, count).isEqualTo(times);
+			assertThat(count)
+					.withFailMessage("Expected key '%s' to be requested exactly %s times. But was %s.", key, times, count)
+					.isEqualTo(times);
 		}
 	}
 

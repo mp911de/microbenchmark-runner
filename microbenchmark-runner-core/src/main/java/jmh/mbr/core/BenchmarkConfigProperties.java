@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -12,12 +12,12 @@ package jmh.mbr.core;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
- * @author Christoph Strobl
+ * Collection of {@link ConfigProperty configuration properties}.
  */
-public
-interface BenchmarkConfigProperties {
+public interface BenchmarkConfigProperties {
 
 	String PREFIX = "jmh.mbr.";
 
@@ -42,8 +42,23 @@ interface BenchmarkConfigProperties {
 
 	ConfigProperty<Integer> FORKS = new ConfigProperty<>(-1, PREFIX + "forks", "f");
 
+	/**
+	 * Return a {@link Iterator} over all {@link ConfigProperty properties}.
+	 *
+	 * @return a {@link List} over all {@link ConfigProperty properties}.
+	 */
 	static Iterator<ConfigProperty<?>> iterator() {
-		return Arrays.<ConfigProperty<?>>asList(ENABLED, PROJECT, VERSION, PUBLISH_URI, BENCHMARK_REPORT_DIR, WARMUP_ITERATIONS, WARMUP_BATCH_SIZE, WARMUP_TIME, WARMUP_MODE, MEASUREMENT_ITERATIONS, MEASUREMENT_TIME, MEASUREMENT_BATCH_SIZE, MODE, TIMEOUT, FORKS).iterator();
+		return asList().iterator();
+	}
+
+	/**
+	 * Return a {@link List} of all {@link ConfigProperty properties}.
+	 *
+	 * @return a {@link List} of all {@link ConfigProperty properties}.
+	 */
+	static List<ConfigProperty<?>> asList() {
+		return Arrays
+				.asList(ENABLED, PROJECT, VERSION, PUBLISH_URI, BENCHMARK_REPORT_DIR, WARMUP_ITERATIONS, WARMUP_BATCH_SIZE, WARMUP_TIME, WARMUP_MODE, MEASUREMENT_ITERATIONS, MEASUREMENT_TIME, MEASUREMENT_BATCH_SIZE, MODE, TIMEOUT, FORKS);
 	}
 
 	class ConfigProperty<T> {
@@ -69,8 +84,10 @@ interface BenchmarkConfigProperties {
 			return defaultValue;
 		}
 
+		@SuppressWarnings("unchecked")
 		Class<T> getType() {
-			return defaultValue != null ? (Class<T>) defaultValue.getClass() : (Class<T>) Object.class;
+			return defaultValue != null ? (Class<T>) defaultValue
+					.getClass() : (Class<T>) Object.class;
 		}
 	}
 }

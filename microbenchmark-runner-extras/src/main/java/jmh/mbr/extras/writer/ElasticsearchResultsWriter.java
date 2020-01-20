@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -10,11 +10,15 @@
 package jmh.mbr.extras.writer;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import jmh.mbr.core.ResultsWriter;
 import jmh.mbr.core.model.BenchmarkResults;
 import jmh.mbr.core.model.BenchmarkResults.BenchmarkResult;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
@@ -23,6 +27,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.openjdk.jmh.runner.format.OutputFormat;
 
+/**
+ * {@link ResultsWriter} to write {@link BenchmarkResults} to Elasticserarch.
+ */
 public class ElasticsearchResultsWriter implements ResultsWriter {
 
 	private final RestHighLevelClient client;
@@ -37,22 +44,25 @@ public class ElasticsearchResultsWriter implements ResultsWriter {
 
 	@Override
 	public void write(OutputFormat output, BenchmarkResults results) {
-		results.forEach(this::formatAndPublish);
+		results.forEach(result -> formatAndPublish(output, result));
 	}
 
-	private void formatAndPublish(BenchmarkResult result) {
-		publishJson(result.getMetaData().getProject(), result.map(JsonResultsFormatter::format));
+	private void formatAndPublish(OutputFormat output, BenchmarkResult result) {
+		publishJson(output, result.getMetaData().getProject(), result
+				.map(JsonResultsFormatter::format));
 	}
 
-	void publishJson(String index, String json) {
+	void publishJson(OutputFormat output, String index, String json) {
 
 		IndexRequest request = new IndexRequest(index);
 		request.source(json, XContentType.JSON);
 
 		try {
 			client.index(request, RequestOptions.DEFAULT);
-		} catch (IOException e) {
-			System.err.print(e);
+		}
+		catch (IOException e) {
+			output.println("Write failed: " + e
+					.getMessage() + " " + StackTraceCapture.from(e));
 		}
 	}
 
@@ -60,15 +70,18 @@ public class ElasticsearchResultsWriter implements ResultsWriter {
 
 		RestClientBuilder builder = RestClient.builder(connectionString.getHttpHost());
 
-		// TODO: set auth header
+		if (connectionString.hasCredentials()) {
+			builder.setDefaultHeaders(new Header[] {
+					new BasicHeader(HttpHeaders.AUTHORIZATION, connectionString
+							.getBasicAuth())
+			});
+		}
 
 		return new RestHighLevelClient(builder);
 	}
 
 	/**
 	 * elasticsearch://[username]:[password]@[host]:[port]/
-	 *
-	 * @author Christoph Strobl
 	 */
 	static class ConnectionString {
 
@@ -89,31 +102,38 @@ public class ElasticsearchResultsWriter implements ResultsWriter {
 
 		static ConnectionString fromUri(String uri) {
 
-			boolean ssl = ssl(uri);
+			boolean ssl = isSsl(uri);
 
 			if (!uri.contains("://")) {
 				return new ConnectionString("localhost", 9200, null, null, ssl);
 			}
 
-			String pruned = uri.substring(uri.indexOf("://") + 3);
+			String authority = uri.substring(uri.indexOf("://") + 3);
 
-			UserPassword upw = UserPassword.from(pruned);
-			HostPort hostPort = HostPort.from(pruned);
+			UserPassword upw = UserPassword.from(authority);
+			HostPort hostPort = HostPort.from(authority);
 
 			return new ConnectionString(hostPort.host, hostPort.port, upw.username, upw.password, ssl);
 		}
 
-		private static boolean ssl(String uri) {
-			return uri.startsWith("elasticsearchs");
-		}
-
 		HttpHost getHttpHost() {
-			return new HttpHost(this.host, this.port, ssl ? "https" : "http");
+			return new HttpHost(this.host, this.port, this.ssl ? "https" : "http");
 		}
-
 
 		boolean hasCredentials() {
-			return false;
+			return this.username != null && this.password != null;
+		}
+
+		private String getBasicAuth() {
+
+			String credentialsString = this.username + ":" + new String(this.password);
+			byte[] encodedBytes = Base64.getEncoder()
+					.encode(credentialsString.getBytes());
+			return "Basic " + new String(encodedBytes);
+		}
+
+		private static boolean isSsl(String uri) {
+			return uri.startsWith("elasticsearchs");
 		}
 
 		private static class UserPassword {
@@ -139,7 +159,7 @@ public class ElasticsearchResultsWriter implements ResultsWriter {
 				String[] args = connectionString.split("@");
 
 				if (!args[0].contains(":")) {
-					none();
+					return none();
 				}
 
 				String[] userPwd = args[0].split(":");
@@ -148,7 +168,6 @@ public class ElasticsearchResultsWriter implements ResultsWriter {
 		}
 
 		private static class HostPort {
-
 
 			final String host;
 			final int port;

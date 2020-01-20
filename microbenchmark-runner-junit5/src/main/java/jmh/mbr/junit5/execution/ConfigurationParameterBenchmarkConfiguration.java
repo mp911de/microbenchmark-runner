@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -20,7 +20,10 @@ import jmh.mbr.core.BenchmarkConfiguration;
 import jmh.mbr.core.Environment;
 import org.junit.platform.engine.ConfigurationParameters;
 
-public class ConfigurationParameterBenchmarkConfiguration implements BenchmarkConfiguration {
+/**
+ * {@link BenchmarkConfiguration} obtained from {@link ConfigurationParameters}.
+ */
+class ConfigurationParameterBenchmarkConfiguration implements BenchmarkConfiguration {
 
 	private final ConfigurationParameters configurationParameters;
 
@@ -40,7 +43,8 @@ public class ConfigurationParameterBenchmarkConfiguration implements BenchmarkCo
 
 	@Override
 	public Duration getWarmupTime() {
-		return getConfigParameterOrDefault(BenchmarkConfigProperties.WARMUP_TIME, it -> Duration.ofSeconds(Long.parseLong(it)));
+		return getConfigParameterOrDefault(BenchmarkConfigProperties.WARMUP_TIME, it -> Duration
+				.ofSeconds(Long.parseLong(it)));
 	}
 
 	@Override
@@ -79,7 +83,8 @@ public class ConfigurationParameterBenchmarkConfiguration implements BenchmarkCo
 
 	@Override
 	public Duration getMeasurementTime() {
-		return getConfigParameterOrDefault(BenchmarkConfigProperties.MEASUREMENT_TIME, it -> Duration.ofSeconds(Long.parseLong(it)));
+		return getConfigParameterOrDefault(BenchmarkConfigProperties.MEASUREMENT_TIME, it -> Duration
+				.ofSeconds(Long.parseLong(it)));
 	}
 
 	@Override
@@ -89,7 +94,8 @@ public class ConfigurationParameterBenchmarkConfiguration implements BenchmarkCo
 
 	@Override
 	public Duration getTimeout() {
-		return getConfigParameterOrDefault(BenchmarkConfigProperties.TIMEOUT, it -> Duration.ofSeconds(Long.parseLong(it)));
+		return getConfigParameterOrDefault(BenchmarkConfigProperties.TIMEOUT, it -> Duration
+				.ofSeconds(Long.parseLong(it)));
 	}
 
 	@Override

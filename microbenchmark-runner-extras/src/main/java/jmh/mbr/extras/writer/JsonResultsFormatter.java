@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -30,7 +30,8 @@ import org.openjdk.jmh.results.RunResult;
 class JsonResultsFormatter {
 
 	static List<String> createReport(BenchmarkResults results) {
-		return results.flatMapMany(JsonResultsFormatter::format);
+		return results.stream().map(JsonResultsFormatter::format)
+				.collect(Collectors.toList());
 	}
 
 	static String format(MetaData metaData, RunResult runResult) {
