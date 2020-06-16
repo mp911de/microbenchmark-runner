@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -36,7 +36,7 @@ public class InnerStateSmokeTests {
 	@AuxCounters(Type.EVENTS)
 	public static class MainState {
 
-		public static enum Sample {
+		public enum Sample {
 			one, two;
 		}
 

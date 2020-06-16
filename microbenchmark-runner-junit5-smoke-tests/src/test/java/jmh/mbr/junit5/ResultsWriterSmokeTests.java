@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.platform.commons.annotation.Testable;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
@@ -21,7 +20,6 @@ import org.openjdk.jmh.annotations.Warmup;
 
 @Microbenchmark
 @State(Scope.Thread)
-// @Disabled("Need to get system property aware test here")
 public class ResultsWriterSmokeTests {
 
 	double x1 = Math.PI;
