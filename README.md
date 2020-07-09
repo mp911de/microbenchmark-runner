@@ -110,9 +110,10 @@ Microbenchmark Runner uses JUnit infrastructure to select Benchmarks to run and 
 Microbenchmark Runner comes with pluggable support for result output. Results are published using the `jmh.mbr.core.ResultsWriterFactory` SPI.
 
 Bundled publishers in `microbenchmark-runner-extras` are:
-    * CSV reporting to System.out (enabled by default or with `-DpublishTo=sysout`)
-    * CSV reporting to a file (enabled with `-DpublishTo=csv:location/to/file`)
-    * Elasticsearch reporting (enabled with `-DpublishTo=elasticsearch://[username]:[password]@[host]:[port]/`). The index name is controlled through an external property `jmh.mbr.project`.     
+
+* CSV reporting to System.out (enabled by default or with `-Djmh.mbr.report.publishTo=sysout`)
+* CSV reporting to a file (enabled with `-Djmh.mbr.report.publishTo=csv:location/to/file`)
+* Elasticsearch reporting (enabled with `-Djmh.mbr.report.publishTo=elasticsearch://[username]:[password]@[host]:[port]/`). The index name is controlled through an external property `jmh.mbr.project`.     
 
 # Reporting Issues
 
