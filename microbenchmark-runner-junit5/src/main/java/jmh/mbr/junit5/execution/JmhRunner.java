@@ -102,10 +102,21 @@ public class JmhRunner {
 
 		try {
 			listener.executionStarted(testDescriptor);
-			support.publishResults(notifyingOutputFormat, new BenchmarkResults(MetaData.from(jmhOptions.asMap()), runBenchmarks(runOptions, notifyingOutputFormat)));
+			for (TestDescriptor child : testDescriptor.getChildren()) {
+				listener.executionStarted(child);
+			}
+
+			support.publishResults(notifyingOutputFormat, new BenchmarkResults(MetaData
+					.from(jmhOptions
+							.asMap()), runBenchmarks(runOptions, notifyingOutputFormat)));
 			listener.executionFinished(testDescriptor, TestExecutionResult.successful());
-		} catch (RunnerException e) {
+		}
+		catch (RuntimeException | RunnerException e) {
+
 			listener.executionFinished(testDescriptor, TestExecutionResult.failed(e));
+			for (TestDescriptor child : testDescriptor.getChildren()) {
+				listener.executionFinished(child, TestExecutionResult.failed(e));
+			}
 		}
 	}
 
