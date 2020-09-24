@@ -42,8 +42,8 @@
     </licenses>
 
     <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/mp911de/microbenchmark-runner</url>
+        <system>GitHub Actions</system>
+        <url>https://github.com/mp911de/microbenchmark-runner/actions</url>
     </ciManagement>
 
     <issueManagement>
@@ -112,6 +112,7 @@
 				</executions>
 				<configuration>
 					<doclint>none</doclint>
+					<source>8</source>
 				</configuration>
 			</plugin>
 			<plugin>

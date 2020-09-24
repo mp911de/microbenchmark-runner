@@ -1,0 +1,29 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '17' ]
+        architecture: [ 'x64' ]
+    name: Build with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          architecture: ${{ matrix.architecture }}
+          distribution: 'zulu'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: ./mvnw --batch-mode verify
