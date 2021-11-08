@@ -42,22 +42,33 @@ Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're ab
 public class SimpleBenchmark {
 
     @State
-    static class MyParameters {
+	static class MyParameters {
 
-        @Param({"1", "10", "100"})  // renders parametrized benchmarks as sub-tests
-        String batchSize;
-    }
-    
-    @Benchmark
-    public void foo(MyParameters myParameters) {}
+		@Param({"1", "10", "100"})  // renders parametrized benchmarks as sub-tests
+		String batchSize;
+	}
+
+	@Benchmark
+	public void foo(MyParameters myParameters) {
+	}
 }
 ```
 
-Annotate your JMH benchmark with `@Microbenchmark`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. 
+**Compatibility matrix**
+
+| MBR Version | JUnit 5 Version |
+| ----------- | --------------- |
+| 0.2.x       | 5.5+            |
+| 0.3.x       | 5.8+            |
+
+Annotate your JMH benchmark with `@Microbenchmark`. Now you're able to leverage your IDE
+to start JMH benchmarks without fighting the command line.
 
 # Integrate it in your project
 
-The easiest way is to use [jitpack.io](https://jitpack.io/#mp911de/microbenchmark-runner/master) to include Microbenchmark Runner in your project:
+The easiest way is to
+use [jitpack.io](https://jitpack.io/#mp911de/microbenchmark-runner/master) to include
+Microbenchmark Runner in your project:
 
 Add the following repository to your `pom.xml` (when using Maven):
 

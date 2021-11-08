@@ -25,7 +25,7 @@ import org.junit.platform.engine.EngineExecutionListener;
  */
 class BenchmarkMethodExtensionContext extends AbstractExtensionContext<AbstractBenchmarkDescriptor> {
 
-	private MethodAware methodAware;
+	private final MethodAware methodAware;
 
 	BenchmarkMethodExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, MethodAware methodAware, ConfigurationParameters configurationParameters) {
 		super(parent, engineExecutionListener, (AbstractBenchmarkDescriptor) methodAware, configurationParameters);
@@ -66,4 +66,5 @@ class BenchmarkMethodExtensionContext extends AbstractExtensionContext<AbstractB
 	public Optional<Throwable> getExecutionException() {
 		return Optional.empty();
 	}
+
 }

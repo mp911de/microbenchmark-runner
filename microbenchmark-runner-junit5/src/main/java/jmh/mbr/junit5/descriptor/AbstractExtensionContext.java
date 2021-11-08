@@ -14,9 +14,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.engine.execution.ExtensionValuesStore;
 import org.junit.jupiter.engine.execution.NamespaceAwareStore;
 import org.junit.platform.engine.ConfigurationParameters;
@@ -111,5 +113,15 @@ abstract class AbstractExtensionContext<T extends TestDescriptor> implements Ext
 	@Override
 	public Optional<String> getConfigurationParameter(String key) {
 		return this.configurationParameters.get(key);
+	}
+
+	@Override
+	public <T> Optional<T> getConfigurationParameter(String key, Function<String, T> transformer) {
+		return getConfigurationParameter(key).map(transformer);
+	}
+
+	@Override
+	public ExecutionMode getExecutionMode() {
+		return ExecutionMode.SAME_THREAD;
 	}
 }

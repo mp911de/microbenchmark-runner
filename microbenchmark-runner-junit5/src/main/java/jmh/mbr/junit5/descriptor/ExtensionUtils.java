@@ -39,6 +39,6 @@ abstract class ExtensionUtils {
 				.collect(Collectors.toList());
 
 		return MutableExtensionRegistry
-				.createRegistryFrom(parentRegistry, extensionTypes);
+				.createRegistryFrom(parentRegistry, extensionTypes.stream());
 	}
 }

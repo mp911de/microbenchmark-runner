@@ -12,7 +12,7 @@
 
 	<groupId>com.github.mp911de.microbenchmark-runner</groupId>
 	<artifactId>microbenchmark-runner-parent</artifactId>
-	<version>0.2.1.BUILD-SNAPSHOT</version>
+	<version>0.3.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>JUnit-based Microbenchmark Runners for JMH</name>
 
@@ -28,7 +28,7 @@
 		<jmh.version>1.22</jmh.version>
 		<assertj.version>3.11.1</assertj.version>
 		<junit4.version>4.12</junit4.version>
-		<junit5.version>5.5.1</junit5.version>
+		<junit5.version>5.8.1</junit5.version>
 	</properties>
 
 	<url>http://github.com/mp911de/microbenchmark-runner</url>
