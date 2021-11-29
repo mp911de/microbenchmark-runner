@@ -1,7 +1,7 @@
 Microbenchmark Runner
 =====================
 
-[![](https://jitpack.io/v/mp911de/microbenchmark-runner.svg)](https://jitpack.io/#mp911de/microbenchmark-runner) [![Build Status](https://travis-ci.org/mp911de/microbenchmark-runner.svg?branch=master)](https://travis-ci.org/mp911de/microbenchmark-runner)
+[![](https://jitpack.io/v/mp911de/microbenchmark-runner.svg)](https://jitpack.io/#mp911de/microbenchmark-runner) [![CI](https://github.com/mp911de/microbenchmark-runner/actions/workflows/ci.yml/badge.svg)](https://github.com/mp911de/microbenchmark-runner/actions/workflows/ci.yml)
 
 Microbenchmark Runner is a JUnit (JUnit 4.12/JUnit 5.5) extension to launch JMH benchmarks using JUnit directly by using existing JUnit integrations.
 
