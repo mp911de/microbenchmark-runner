@@ -9,14 +9,6 @@
  */
 package jmh.mbr.junit5.execution;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-
 import jmh.mbr.core.model.BenchmarkClass;
 import jmh.mbr.core.model.BenchmarkDescriptor;
 import jmh.mbr.core.model.BenchmarkDescriptorFactory;
@@ -26,6 +18,18 @@ import jmh.mbr.junit5.JmhRunnerStub;
 import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
@@ -37,8 +41,6 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.reporting.ReportEntry;
 import org.openjdk.jmh.annotations.Benchmark;
-
-import static org.assertj.core.api.Assertions.*;
 
 /**
  * Unit tests for {@link JmhRunner}.
@@ -196,6 +198,11 @@ public class JmhRunnerUnitTests {
 		}
 
 		@Override
+		public Set<String> keySet() {
+			return new LinkedHashSet<>(capturedKeys);
+		}
+
+		@Override
 		public Optional<Boolean> getBoolean(String key) {
 			return get(key).map(Boolean::parseBoolean);
 		}
@@ -240,6 +247,11 @@ public class JmhRunnerUnitTests {
 		@Override
 		public int size() {
 			return 0;
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return Collections.emptySet();
 		}
 	}
 

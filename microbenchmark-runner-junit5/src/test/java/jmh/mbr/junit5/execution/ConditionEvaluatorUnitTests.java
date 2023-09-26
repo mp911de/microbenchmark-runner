@@ -9,11 +9,14 @@
  */
 package jmh.mbr.junit5.execution;
 
-import java.util.Collections;
-import java.util.Optional;
-
 import jmh.mbr.core.model.BenchmarkClass;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
@@ -26,8 +29,6 @@ import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.UniqueId;
 import org.openjdk.jmh.annotations.Benchmark;
-
-import static org.assertj.core.api.Assertions.*;
 
 /**
  * Unit tests for {@link ConditionEvaluator}.
@@ -125,9 +126,15 @@ public class ConditionEvaluatorUnitTests {
 			return Optional.empty();
 		}
 
+
 		@Override
 		public int size() {
 			return 0;
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return Collections.emptySet();
 		}
 	}
 
