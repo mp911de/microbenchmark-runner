@@ -68,7 +68,7 @@ to start JMH benchmarks without fighting the command line.
 # Integrate it in your project
 
 The easiest way is to
-use [jitpack.io](https://jitpack.io/#mp911de/microbenchmark-runner/master) to include
+use [jitpack.io](https://jitpack.io/#mp911de/microbenchmark-runner/main) to include
 Microbenchmark Runner in your project:
 
 Add the following repository to your `pom.xml` (when using Maven):
