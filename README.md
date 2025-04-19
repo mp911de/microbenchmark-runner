@@ -57,10 +57,11 @@ public class SimpleBenchmark {
 **Compatibility matrix**
 
 | MBR Version | JUnit 5 Version |
-|-------------|----------------|
-| 0.2.x       | 5.5+           |
-| 0.3.x       | 5.8+           |
-| 0.4.x       | 5.10+          |
+|-------------|-----------------|
+| 0.2.x       | 5.5+            |
+| 0.3.x       | 5.8+            |
+| 0.4.x       | 5.10+           |
+| 0.5.x       | 5.12+           |
 
 Annotate your JMH benchmark with `@Microbenchmark`. Now you're able to leverage your IDE
 to start JMH benchmarks without fighting the command line.
