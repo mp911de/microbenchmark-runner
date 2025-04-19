@@ -18,8 +18,9 @@ import jmh.mbr.junit5.JmhRunnerStub;
 import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
-import static org.assertj.core.api.Assertions.*;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -30,15 +31,18 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.reporting.OutputDirectoryProvider;
 import org.junit.platform.engine.reporting.ReportEntry;
 import org.openjdk.jmh.annotations.Benchmark;
 
@@ -47,9 +51,14 @@ import org.openjdk.jmh.annotations.Benchmark;
  */
 public class JmhRunnerUnitTests {
 
-	JmhRunnerStub runner = new JmhRunnerStub(EmptyConfigurationParameters.INSTANCE, MutableExtensionRegistry
-			.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE))) {
-	};
+	JmhRunnerStub runner;
+
+	{
+		JupiterConfiguration configuration = new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE, EmptyOutputDirectoryProvider.INSTANCE);
+		runner = new JmhRunnerStub(configuration, MutableExtensionRegistry
+				.createRegistryWithDefaultExtensions(configuration)) {
+		};
+	}
 
 	@Test
 	void shouldIncludeUnconditionalBenchmarkClass() {
@@ -116,8 +125,9 @@ public class JmhRunnerUnitTests {
 		CapturingConfigurationParameters parameters = new CapturingConfigurationParameters(Collections
 				.singletonMap("jmh.mbr.project", "my beloved one!"));
 
-		JmhRunnerStub runner = new JmhRunnerStub(parameters, MutableExtensionRegistry
-				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(EmptyConfigurationParameters.INSTANCE))) {
+		DefaultJupiterConfiguration configuration = new DefaultJupiterConfiguration(parameters, EmptyOutputDirectoryProvider.INSTANCE);
+		JmhRunnerStub runner = new JmhRunnerStub(configuration, MutableExtensionRegistry
+				.createRegistryWithDefaultExtensions(configuration)) {
 		};
 
 		runner.onRunReturnEmptyResult();
@@ -252,6 +262,20 @@ public class JmhRunnerUnitTests {
 		@Override
 		public Set<String> keySet() {
 			return Collections.emptySet();
+		}
+	}
+
+	enum EmptyOutputDirectoryProvider implements OutputDirectoryProvider {
+		INSTANCE;
+
+		@Override
+		public Path getRootDirectory() {
+			return null;
+		}
+
+		@Override
+		public Path createOutputDirectory(TestDescriptor testDescriptor) throws IOException {
+			return null;
 		}
 	}
 

@@ -13,6 +13,8 @@ import jmh.mbr.core.model.MethodAware;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.hierarchical.Node.ExecutionMode;
 
 /**
@@ -29,8 +32,8 @@ class BenchmarkMethodExtensionContext extends AbstractExtensionContext<AbstractB
 
 	private final MethodAware methodAware;
 
-	BenchmarkMethodExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, MethodAware methodAware, JupiterConfiguration configurationParameters) {
-		super(parent, engineExecutionListener, (AbstractBenchmarkDescriptor) methodAware, configurationParameters);
+	BenchmarkMethodExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, MethodAware methodAware, JupiterConfiguration configuration, TestDescriptor testDescriptor) {
+		super(parent, engineExecutionListener, (AbstractBenchmarkDescriptor) methodAware, configuration);
 		this.methodAware = methodAware;
 	}
 
@@ -72,5 +75,10 @@ class BenchmarkMethodExtensionContext extends AbstractExtensionContext<AbstractB
 	@Override
 	protected ExecutionMode getPlatformExecutionMode() {
 		return ExecutionMode.SAME_THREAD;
+	}
+
+	@Override
+	public List<Class<?>> getEnclosingTestClasses() {
+		return Collections.emptyList();
 	}
 }

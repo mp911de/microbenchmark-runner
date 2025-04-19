@@ -11,13 +11,14 @@ package jmh.mbr.junit5.descriptor;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstances;
-import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
-import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.support.hierarchical.Node.ExecutionMode;
 
@@ -26,8 +27,8 @@ import org.junit.platform.engine.support.hierarchical.Node.ExecutionMode;
  */
 class BenchmarkClassExtensionContext extends AbstractExtensionContext<BenchmarkClassDescriptor> {
 
-	BenchmarkClassExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, BenchmarkClassDescriptor testDescriptor, ConfigurationParameters configurationParameters) {
-		super(parent, engineExecutionListener, testDescriptor, new DefaultJupiterConfiguration(configurationParameters));
+	BenchmarkClassExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, BenchmarkClassDescriptor testDescriptor, JupiterConfiguration configuration) {
+		super(parent, engineExecutionListener, testDescriptor, configuration);
 	}
 
 	@Override
@@ -44,7 +45,6 @@ class BenchmarkClassExtensionContext extends AbstractExtensionContext<BenchmarkC
 	public Optional<Lifecycle> getTestInstanceLifecycle() {
 		return Optional.empty();
 	}
-
 
 	@Override
 	public Optional<Object> getTestInstance() {
@@ -69,5 +69,10 @@ class BenchmarkClassExtensionContext extends AbstractExtensionContext<BenchmarkC
 	@Override
 	protected ExecutionMode getPlatformExecutionMode() {
 		return ExecutionMode.SAME_THREAD;
+	}
+
+	@Override
+	public List<Class<?>> getEnclosingTestClasses() {
+		return Collections.emptyList();
 	}
 }

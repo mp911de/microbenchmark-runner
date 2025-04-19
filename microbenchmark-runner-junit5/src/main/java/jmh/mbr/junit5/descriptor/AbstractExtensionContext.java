@@ -9,28 +9,35 @@
  */
 package jmh.mbr.junit5.descriptor;
 
-import static java.util.stream.Collectors.*;
-
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import static java.util.stream.Collectors.*;
 
 import org.junit.jupiter.api.extension.ExecutableInvoker;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Store.CloseableResource;
+import org.junit.jupiter.api.extension.MediaType;
+import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.NamespaceAwareStore;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.commons.util.Preconditions;
+import org.junit.platform.commons.util.UnrecoverableExceptions;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestTag;
+import org.junit.platform.engine.reporting.FileEntry;
 import org.junit.platform.engine.reporting.ReportEntry;
 import org.junit.platform.engine.support.hierarchical.Node;
 import org.junit.platform.engine.support.store.NamespacedHierarchicalStore;
@@ -162,6 +169,49 @@ abstract class AbstractExtensionContext<T extends TestDescriptor> implements Ext
 	}
 
 	protected abstract Node.ExecutionMode getPlatformExecutionMode();
+
+	@Override
+	public void publishFile(String name, MediaType mediaType, ThrowingConsumer<Path> action) {
+
+	}
+
+	public void publishDirectory(String name, ThrowingConsumer<Path> action) {
+		Preconditions.notNull(name, "name must not be null");
+		Preconditions.notNull(action, "action must not be null");
+		ThrowingConsumer<Path> enhancedAction = (path) -> {
+			Files.createDirectory(path);
+			action.accept(path);
+		};
+		this.publishFileEntry(name, enhancedAction, (file) -> {
+			Preconditions.condition(Files.isDirectory(file, new LinkOption[0]), () -> "Published path must be a directory: " + file);
+			return FileEntry.from(file, (String) null);
+		});
+	}
+
+	private void publishFileEntry(String name, ThrowingConsumer<Path> action, Function<Path, FileEntry> fileEntryCreator) {
+		Path dir = this.createOutputDirectory();
+		Path path = dir.resolve(name);
+		Preconditions.condition(path.getParent().equals(dir), () -> "name must not contain path separators: " + name);
+
+		try {
+			action.accept(path);
+		} catch (Throwable t) {
+			UnrecoverableExceptions.rethrowIfUnrecoverable(t);
+			throw new JUnitException("Failed to publish path", t);
+		}
+
+		Preconditions.condition(Files.exists(path, new LinkOption[0]), () -> "Published path must exist: " + path);
+		FileEntry fileEntry = fileEntryCreator.apply(path);
+		this.engineExecutionListener.fileEntryPublished(this.benchmarkDescriptor, fileEntry);
+	}
+
+	private Path createOutputDirectory() {
+		try {
+			return this.configuration.getOutputDirectoryProvider().createOutputDirectory(this.benchmarkDescriptor);
+		} catch (IOException e) {
+			throw new JUnitException("Failed to create output directory", e);
+		}
+	}
 
 	private ExecutionMode toJupiterExecutionMode(Node.ExecutionMode mode) {
 		switch (mode) {

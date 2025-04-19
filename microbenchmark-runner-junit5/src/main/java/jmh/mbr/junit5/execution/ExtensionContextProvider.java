@@ -9,18 +9,19 @@
  */
 package jmh.mbr.junit5.execution;
 
+import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
-import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 
@@ -32,23 +33,23 @@ class ExtensionContextProvider implements AutoCloseable {
 	private static final Logger logger = LoggerFactory.getLogger(ConditionEvaluator.class);
 
 	private final EngineExecutionListener listener;
-	private final ConfigurationParameters configurationParameters;
+	private final JupiterConfiguration configuration;
 	private final Map<AbstractBenchmarkDescriptor, ExtensionContext> contextMap = new LinkedHashMap<>();
 
-	private ExtensionContextProvider(EngineExecutionListener listener, ConfigurationParameters configurationParameters) {
+	private ExtensionContextProvider(EngineExecutionListener listener, JupiterConfiguration configuration) {
 		this.listener = listener;
-		this.configurationParameters = configurationParameters;
+		this.configuration = configuration;
 	}
 
 	/**
 	 * Creates a new {@link ExtensionContextProvider}.
 	 *
 	 * @param listener must not be {@literal null}.
-	 * @param configurationParameters must not be {@literal null}.
+	 * @param configuration must not be {@literal null}.
 	 * @return the new {@link ExtensionContextProvider}.
 	 */
-	static ExtensionContextProvider create(EngineExecutionListener listener, ConfigurationParameters configurationParameters) {
-		return new ExtensionContextProvider(listener, configurationParameters);
+	static ExtensionContextProvider create(EngineExecutionListener listener, JupiterConfiguration configuration) {
+		return new ExtensionContextProvider(listener, configuration);
 	}
 
 	ExtensionContext getExtensionContext(Optional<TestDescriptor> benchmarkClassDescriptor) {
@@ -60,7 +61,7 @@ class ExtensionContextProvider implements AutoCloseable {
 	}
 
 	ExtensionContext getExtensionContext(BenchmarkClassDescriptor descriptor) {
-		return contextMap.computeIfAbsent(descriptor, key -> key.getExtensionContext(null, listener, configurationParameters));
+		return contextMap.computeIfAbsent(descriptor, key -> key.getExtensionContext(null, listener, configuration));
 	}
 
 	@Override

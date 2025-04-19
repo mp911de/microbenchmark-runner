@@ -11,12 +11,13 @@ package jmh.mbr.junit5.execution;
 
 import jmh.mbr.core.model.BenchmarkClass;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
-import static org.assertj.core.api.Assertions.*;
+import jmh.mbr.junit5.execution.JmhRunnerUnitTests.EmptyOutputDirectoryProvider;
 
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
@@ -35,17 +37,19 @@ import org.openjdk.jmh.annotations.Benchmark;
  */
 public class ConditionEvaluatorUnitTests {
 
+	JupiterConfiguration configuration = new DefaultJupiterConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE, EmptyOutputDirectoryProvider.INSTANCE);
+
 	@Test
 	void shouldRunWithoutCondition() {
 
 		ExtensionRegistry registry = MutableExtensionRegistry
-				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE));
+				.createRegistryWithDefaultExtensions(configuration);
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(SimpleBenchmarkClass.class);
 
 		ConditionEvaluator evaluator = new ConditionEvaluator();
 		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor
-				.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
+				.getExtensionContext(null, null, configuration));
 
 		assertThat(result.isDisabled()).isFalse();
 	}
@@ -54,13 +58,13 @@ public class ConditionEvaluatorUnitTests {
 	void shouldSkipDisabledBenchmarkClass() {
 
 		ExtensionRegistry registry = MutableExtensionRegistry
-				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE));
+				.createRegistryWithDefaultExtensions(configuration);
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(DisabledBenchmark.class);
 
 		ConditionEvaluator evaluator = new ConditionEvaluator();
 		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor
-				.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
+				.getExtensionContext(null, null, configuration));
 
 		assertThat(result.isDisabled()).isTrue();
 	}
@@ -69,14 +73,14 @@ public class ConditionEvaluatorUnitTests {
 	void shouldSkipDisabledThroughExtensionClass() {
 
 		MutableExtensionRegistry parentRegistry = MutableExtensionRegistry
-				.createRegistryWithDefaultExtensions(new DefaultJupiterConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE));
+				.createRegistryWithDefaultExtensions(configuration);
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(CustomExtensionBenchmark.class);
 		ExtensionRegistry registry = descriptor.getExtensionRegistry(parentRegistry);
 
 		ConditionEvaluator evaluator = new ConditionEvaluator();
 		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor
-				.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
+				.getExtensionContext(null, null, configuration));
 
 		assertThat(result.isDisabled()).isTrue();
 		assertThat(result.getReason()).contains("always disabled");

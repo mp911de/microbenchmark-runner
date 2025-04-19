@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
+import org.junit.platform.commons.support.scanning.ClassFilter;
 import org.junit.platform.commons.util.BlacklistedExceptions;
-import org.junit.platform.commons.util.ClassFilter;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.commons.util.StringUtils;
 import org.junit.platform.engine.TestDescriptor;
@@ -130,7 +130,6 @@ class JavaElementsResolver {
 			if (resolvedDescriptors.isEmpty()) {
 				logger.debug(() -> String.format("Method '%s' could not be resolved.", testMethod.toGenericString()));
 			}
-
 		} catch (Throwable t) {
 			BlacklistedExceptions.rethrowIfBlacklisted(t);
 			logger.debug(t, () -> String.format("Method '%s' in class '%s' could not be resolved.", selector.getMethodName(),
@@ -195,7 +194,7 @@ class JavaElementsResolver {
 				List<Segment> unresolved = segments.subList(1, segments.size()); // Remove engine ID
 				unresolved = unresolved.subList(numSegmentsResolved, unresolved.size()); // Remove resolved segments
 				return String.format("Unique ID '%s' could only be partially resolved. "
-						+ "All resolved segments will be executed; however, the " + "following segments could not be resolved: %s",
+								+ "All resolved segments will be executed; however, the " + "following segments could not be resolved: %s",
 						uniqueId, unresolved);
 			});
 		} else {
@@ -223,7 +222,7 @@ class JavaElementsResolver {
 	}
 
 	private void resolveContainedMethods(TestDescriptor containerDescriptor, Class<?> testClass,
-			BiConsumer<AnnotatedElement, TestDescriptor> fixtureResolver) {
+										 BiConsumer<AnnotatedElement, TestDescriptor> fixtureResolver) {
 
 		List<Method> benchmarkMethodCandidates = ReflectionUtils.findMethods(testClass, IsBenchmarkMethod.INSTANCE);
 		benchmarkMethodCandidates.forEach(it -> {
@@ -242,7 +241,7 @@ class JavaElementsResolver {
 	}
 
 	private Set<TestDescriptor> tryToResolveWithResolver(AnnotatedElement element, TestDescriptor parent,
-			ElementResolver resolver) {
+														 ElementResolver resolver) {
 
 		Set<TestDescriptor> resolvedDescriptors = resolver.resolveElement(element, parent);
 		Set<TestDescriptor> result = new LinkedHashSet<>();

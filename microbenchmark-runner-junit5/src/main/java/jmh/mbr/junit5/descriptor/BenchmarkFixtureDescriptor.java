@@ -9,14 +9,15 @@
  */
 package jmh.mbr.junit5.descriptor;
 
-import java.util.Set;
-
 import jmh.mbr.core.model.BenchmarkFixture;
 import jmh.mbr.core.model.BenchmarkMethod;
+
+import java.util.Set;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
@@ -47,7 +48,7 @@ public class BenchmarkFixtureDescriptor extends AbstractBenchmarkDescriptor {
 	}
 
 	@Override
-	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
+	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, JupiterConfiguration configuration) {
 		throw new UnsupportedOperationException();
 	}
 

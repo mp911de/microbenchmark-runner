@@ -9,6 +9,18 @@
  */
 package jmh.mbr.junit5.execution;
 
+import jmh.mbr.core.BenchmarkConfiguration;
+import jmh.mbr.core.JmhSupport;
+import jmh.mbr.core.StringUtils;
+import jmh.mbr.core.model.BenchmarkResults;
+import jmh.mbr.core.model.BenchmarkResults.MetaData;
+import jmh.mbr.core.model.MethodAware;
+import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
+import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
+import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,22 +38,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jmh.mbr.core.BenchmarkConfiguration;
-import jmh.mbr.core.JmhSupport;
-import jmh.mbr.core.StringUtils;
-import jmh.mbr.core.model.BenchmarkResults;
-import jmh.mbr.core.model.BenchmarkResults.MetaData;
-import jmh.mbr.core.model.MethodAware;
-import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
-import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
-import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
-import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
-import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -64,17 +65,17 @@ public class JmhRunner {
 
 	private static final ConditionEvaluator evaluator = new ConditionEvaluator();
 
-	private final ConfigurationParameters configurationParameters;
+	private final JupiterConfiguration configuration;
 	private final MutableExtensionRegistry extensionRegistry;
 
-	public JmhRunner(ConfigurationParameters configurationParameters, MutableExtensionRegistry extensionRegistry) {
-		this.configurationParameters = configurationParameters;
+	public JmhRunner(JupiterConfiguration configuration, MutableExtensionRegistry extensionRegistry) {
+		this.configuration = configuration;
 		this.extensionRegistry = extensionRegistry;
 	}
 
 	public void execute(TestDescriptor testDescriptor, EngineExecutionListener listener) {
 
-		BenchmarkConfiguration jmhOptions = new ConfigurationParameterBenchmarkConfiguration(configurationParameters);
+		BenchmarkConfiguration jmhOptions = new ConfigurationParameterBenchmarkConfiguration(configuration);
 		JmhSupport support = initJmhSupport(jmhOptions);
 
 		ChainedOptionsBuilder optionsBuilder = support.options();
@@ -110,8 +111,7 @@ public class JmhRunner {
 					.from(jmhOptions
 							.asMap()), runBenchmarks(runOptions, notifyingOutputFormat)));
 			listener.executionFinished(testDescriptor, TestExecutionResult.successful());
-		}
-		catch (RuntimeException | RunnerException e) {
+		} catch (RuntimeException | RunnerException e) {
 
 			listener.executionFinished(testDescriptor, TestExecutionResult.failed(e));
 			for (TestDescriptor child : testDescriptor.getChildren()) {
@@ -149,7 +149,7 @@ public class JmhRunner {
 	@SuppressWarnings("unchecked")
 	private List<AbstractBenchmarkDescriptor> getIncludes(TestDescriptor testDescriptor) {
 
-		String tests = configurationParameters.get("benchmark").orElse(null);
+		String tests = configuration.getRawConfigurationParameter("benchmark").orElse(null);
 
 		List<BenchmarkClassDescriptor> classes = new ArrayList<>();
 
@@ -187,7 +187,7 @@ public class JmhRunner {
 
 	protected List<String> evaluateBenchmarksToRun(List<AbstractBenchmarkDescriptor> includes, EngineExecutionListener listener) {
 
-		try (ExtensionContextProvider contextProvider = ExtensionContextProvider.create(listener, configurationParameters)) {
+		try (ExtensionContextProvider contextProvider = ExtensionContextProvider.create(listener, configuration)) {
 
 			List<String> includePatterns = new ArrayList<>();
 
@@ -233,7 +233,7 @@ public class JmhRunner {
 	private SkipResult shouldRun(ExtensionContext parent, AbstractBenchmarkDescriptor descriptor, EngineExecutionListener listener) {
 
 		ExtensionRegistry extensionRegistry = descriptor.getExtensionRegistry(this.extensionRegistry);
-		ExtensionContext extensionContext = descriptor.getExtensionContext(parent, listener, configurationParameters);
+		ExtensionContext extensionContext = descriptor.getExtensionContext(parent, listener, configuration);
 
 		ConditionEvaluationResult evaluationResult = evaluator.evaluate(extensionRegistry, extensionContext);
 
@@ -273,7 +273,7 @@ public class JmhRunner {
 	}
 
 	/**
-	 * {@link OutputFormat} that delegates to another {@link OutputFormat} and notifies {@link RunNotifier} about the
+	 * {@link OutputFormat} that delegates to another {@link OutputFormat} and notifies {@link EngineExecutionListener} about the
 	 * progress.
 	 */
 	static class NotifyingOutputFormat implements OutputFormat {
@@ -300,7 +300,7 @@ public class JmhRunner {
 
 		@Override
 		public void iterationResult(BenchmarkParams benchParams, IterationParams params, int iteration,
-				IterationResult data) {
+									IterationResult data) {
 			delegate.iterationResult(benchParams, params, iteration, data);
 		}
 

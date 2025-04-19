@@ -9,15 +9,14 @@
  */
 package jmh.mbr.junit5.discovery;
 
-import static org.assertj.core.api.Assertions.*;
-
 import jmh.mbr.junit5.PartiallyParametrizedBenchmark;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
 import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ClassFilter;
+import org.junit.platform.commons.support.scanning.ClassFilter;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.DiscoverySelectors;

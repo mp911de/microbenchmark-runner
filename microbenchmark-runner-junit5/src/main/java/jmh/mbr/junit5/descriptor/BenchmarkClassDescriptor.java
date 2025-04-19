@@ -10,10 +10,11 @@
 package jmh.mbr.junit5.descriptor;
 
 import jmh.mbr.core.model.BenchmarkClass;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -45,8 +46,8 @@ public class BenchmarkClassDescriptor extends AbstractBenchmarkDescriptor {
 	}
 
 	@Override
-	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
-		return new BenchmarkClassExtensionContext(parent, engineExecutionListener, this, configurationParameters);
+	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, JupiterConfiguration configuration) {
+		return new BenchmarkClassExtensionContext(parent, engineExecutionListener, this, configuration);
 	}
 
 	@Override

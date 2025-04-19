@@ -9,10 +9,11 @@
  */
 package jmh.mbr.junit5;
 
-import java.util.Optional;
-
 import jmh.mbr.junit5.discovery.DiscoverySelectorResolver;
 import jmh.mbr.junit5.execution.JmhRunner;
+
+import java.util.Optional;
+
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
@@ -47,11 +48,12 @@ public class MicrobenchmarkEngine implements TestEngine {
 	public void execute(ExecutionRequest request) {
 
 		JupiterConfiguration jupiterConfiguration = new DefaultJupiterConfiguration(request
-				.getConfigurationParameters());
+				.getConfigurationParameters(), request.getOutputDirectoryProvider());
 		MutableExtensionRegistry extensionRegistry = MutableExtensionRegistry
 				.createRegistryWithDefaultExtensions(jupiterConfiguration);
 
-		new JmhRunner(request.getConfigurationParameters(), extensionRegistry)
+		JupiterConfiguration configuration = new DefaultJupiterConfiguration(request.getConfigurationParameters(), request.getOutputDirectoryProvider());
+		new JmhRunner(configuration, extensionRegistry)
 				.execute(request.getRootTestDescriptor(), request
 						.getEngineExecutionListener());
 	}

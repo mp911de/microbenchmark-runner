@@ -9,15 +9,17 @@
  */
 package jmh.mbr.junit5.execution;
 
+import jmh.mbr.core.BenchmarkConfigProperties;
+import jmh.mbr.core.BenchmarkConfigProperties.ConfigProperty;
+import jmh.mbr.core.BenchmarkConfiguration;
+import jmh.mbr.core.Environment;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import jmh.mbr.core.BenchmarkConfigProperties;
-import jmh.mbr.core.BenchmarkConfigProperties.ConfigProperty;
-import jmh.mbr.core.BenchmarkConfiguration;
-import jmh.mbr.core.Environment;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.ConfigurationParameters;
 
 /**
@@ -25,10 +27,10 @@ import org.junit.platform.engine.ConfigurationParameters;
  */
 class ConfigurationParameterBenchmarkConfiguration implements BenchmarkConfiguration {
 
-	private final ConfigurationParameters configurationParameters;
+	private final JupiterConfiguration configuration;
 
-	public ConfigurationParameterBenchmarkConfiguration(ConfigurationParameters configurationParameters) {
-		this.configurationParameters = configurationParameters;
+	public ConfigurationParameterBenchmarkConfiguration(JupiterConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -112,9 +114,9 @@ class ConfigurationParameterBenchmarkConfiguration implements BenchmarkConfigura
 
 		for (String propertyName : property.propertyNames()) {
 
-			Optional<String> configValue = configurationParameters.get(propertyName);
+			Optional<T> configValue = configuration.getRawConfigurationParameter(propertyName, mapFunction);
 			if (configValue.isPresent()) {
-				return configValue.map(mapFunction).get();
+				return configValue.get();
 			}
 		}
 

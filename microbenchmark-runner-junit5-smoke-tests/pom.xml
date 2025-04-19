@@ -11,17 +11,16 @@
 
     <artifactId>microbenchmark-runner-junit5-smoke-tests</artifactId>
 
-
     <dependencies>
         <dependency>
             <groupId>com.github.mp911de.microbenchmark-runner</groupId>
             <artifactId>microbenchmark-runner-junit5</artifactId>
-            <version>${parent.version}</version>
+			<version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.mp911de.microbenchmark-runner</groupId>
             <artifactId>microbenchmark-runner-extras</artifactId>
-            <version>${parent.version}</version>
+			<version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
