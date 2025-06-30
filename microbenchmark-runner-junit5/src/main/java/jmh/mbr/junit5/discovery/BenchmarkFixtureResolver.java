@@ -9,86 +9,55 @@
  */
 package jmh.mbr.junit5.discovery;
 
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
+
+import jmh.mbr.core.model.BenchmarkFixture;
+import jmh.mbr.core.model.BenchmarkMethod;
 import jmh.mbr.core.model.ParametrizedBenchmarkMethod;
+import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
 import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.UniqueId.Segment;
+import org.junit.platform.engine.discovery.UniqueIdSelector;
+import org.junit.platform.engine.support.discovery.SelectorResolver;
 
 /**
- * {@link ElementResolver} for {@link jmh.mbr.core.model.BenchmarkFixture fixtures}.
+ * {@link SelectorResolver} for {@link jmh.mbr.core.model.BenchmarkFixture fixtures}.
  */
-class BenchmarkFixtureResolver implements ElementResolver {
+class BenchmarkFixtureResolver implements SelectorResolver {
 
-	private static final String SEGMENT_TYPE = "fixture";
-
-	@Override
-	public Set<TestDescriptor> resolveElement(AnnotatedElement element, TestDescriptor parent) {
-
-		if (!(element instanceof Method)) {
-			return Collections.emptySet();
-		}
-
-		if (!(parent instanceof ParametrizedBenchmarkMethodDescriptor)) {
-			return Collections.emptySet();
-		}
-
-		ParametrizedBenchmarkMethodDescriptor parentDescriptor = (ParametrizedBenchmarkMethodDescriptor) parent;
-
-		Method method = (Method) element;
-
-		if (!parentDescriptor.isUnderlyingMethod(method)) {
-			return Collections.emptySet();
-		}
-
-		return findFixtures(parent.getUniqueId(), parentDescriptor.getParametrizedMethod());
-	}
+	static final String SEGMENT_TYPE = "fixture";
 
 	@Override
-	public Optional<TestDescriptor> resolveUniqueId(Segment segment, TestDescriptor parent) {
+	public Resolution resolve(UniqueIdSelector selector, Context context) {
 
-		if (!segment.getType().equals(SEGMENT_TYPE)) {
-			return Optional.empty();
+		UniqueId uniqueId = selector.getUniqueId();
+		UniqueId.Segment lastSegment = uniqueId.getLastSegment();
+
+		if (lastSegment.getType().equals(BenchmarkFixtureResolver.SEGMENT_TYPE)) {
+			return context
+					.<AbstractBenchmarkDescriptor> addToParent(() -> selectUniqueId(uniqueId.removeLastSegment()), parent -> {
+						ParametrizedBenchmarkMethodDescriptor methodDescriptor = (ParametrizedBenchmarkMethodDescriptor) parent;
+						ParametrizedBenchmarkMethod parametrizedMethod = methodDescriptor.getParametrizedMethod();
+						return parametrizedMethod.getChildren().stream() //
+								.filter(fixture -> fixture.getDisplayName().equals(lastSegment.getValue())) //
+								.findFirst() //
+								.flatMap(fixture -> Optional
+										.of(createFixtureDescriptor(parent, parametrizedMethod.getDescriptor(), fixture)));
+					}).map(descriptor -> Resolution.match(Match.exact(descriptor))).orElse(unresolved());
 		}
 
-		if (!(parent instanceof ParametrizedBenchmarkMethodDescriptor)) {
-			return Optional.empty();
-		}
-
-		ParametrizedBenchmarkMethodDescriptor parentDescriptor = (ParametrizedBenchmarkMethodDescriptor) parent;
-
-		return findTestDescriptor(segment.getValue(), parentDescriptor.getUniqueId(),
-				parentDescriptor.getParametrizedMethod());
+		return unresolved();
 	}
 
-	private Set<TestDescriptor> findFixtures(UniqueId parentId, ParametrizedBenchmarkMethod descriptor) {
-
-		return descriptor.getChildren().stream().map(it -> {
-
-			UniqueId uniqueId = parentId.append(SEGMENT_TYPE, it.getDisplayName());
-			return new BenchmarkFixtureDescriptor(uniqueId, descriptor.getDescriptor(), it);
-		}).collect(Collectors.toSet());
-	}
-
-	private Optional<TestDescriptor> findTestDescriptor(String segmentValue, UniqueId parentId,
-			ParametrizedBenchmarkMethod parametrizedMethod) {
-
-		return parametrizedMethod.getChildren().stream().filter(it -> {
-			return it.getDisplayName().equals(segmentValue);
-		}).map(it -> {
-
-			UniqueId uniqueId = parentId.append(SEGMENT_TYPE, it.getDisplayName());
-
-			return (TestDescriptor) new BenchmarkFixtureDescriptor(uniqueId, parametrizedMethod.getDescriptor(), it);
-		}).findFirst();
+	private BenchmarkFixtureDescriptor createFixtureDescriptor(TestDescriptor parent, BenchmarkMethod method,
+			BenchmarkFixture fixture) {
+		UniqueId uniqueId = parent.getUniqueId().append(BenchmarkFixtureResolver.SEGMENT_TYPE, fixture.getDisplayName());
+		return new BenchmarkFixtureDescriptor(uniqueId, method, fixture);
 	}
 }

@@ -9,103 +9,115 @@
  */
 package jmh.mbr.junit5.discovery;
 
-import jmh.mbr.core.model.BenchmarkClass;
+import static java.util.stream.Collectors.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
+
 import jmh.mbr.core.model.BenchmarkDescriptor;
 import jmh.mbr.core.model.BenchmarkMethod;
 import jmh.mbr.core.model.MethodAware;
 import jmh.mbr.core.model.ParametrizedBenchmarkMethod;
+import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
 import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
+import jmh.mbr.junit5.discovery.predicates.IsBenchmarkMethod;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.UniqueId.Segment;
+import org.junit.platform.engine.discovery.MethodSelector;
+import org.junit.platform.engine.discovery.UniqueIdSelector;
+import org.junit.platform.engine.support.discovery.SelectorResolver;
 
 /**
- * {@link ElementResolver} for {@code Benchmark} {@link Method methods}.
+ * {@link SelectorResolver} for {@code Benchmark} {@link Method methods}.
  */
-class BenchmarkMethodResolver implements ElementResolver {
+class BenchmarkMethodResolver implements SelectorResolver {
 
 	private static final String SEGMENT_TYPE = "method";
 
 	@Override
-	public Set<TestDescriptor> resolveElement(AnnotatedElement element, TestDescriptor parent) {
-
-		if (!(element instanceof Method)) {
-			return Collections.emptySet();
+	public Resolution resolve(MethodSelector selector, Context context) {
+		Method method = selector.getJavaMethod();
+		if (IsBenchmarkMethod.INSTANCE.test(method)) {
+			return context
+					.addToParent(() -> selectClass(method.getDeclaringClass()),
+							parent -> createMethodDescriptor((BenchmarkClassDescriptor) parent, method))
+					.map(BenchmarkMethodResolver::toResolution).orElse(unresolved());
 		}
-
-		if (!(parent instanceof BenchmarkClassDescriptor)) {
-			return Collections.emptySet();
-		}
-
-		Method method = (Method) element;
-		BenchmarkClassDescriptor classDescriptor = (BenchmarkClassDescriptor) parent;
-
-		if (!method.getDeclaringClass().isAssignableFrom(classDescriptor.getJavaClass())) {
-			return Collections.emptySet();
-		}
-
-		return findMethod(parent.getUniqueId(), classDescriptor.getBenchmarkClass(), method).map(Collections::singleton)
-				.orElseGet(Collections::emptySet);
+		return unresolved();
 	}
 
 	@Override
-	public Optional<TestDescriptor> resolveUniqueId(Segment segment, TestDescriptor parent) {
+	public Resolution resolve(UniqueIdSelector selector, Context context) {
 
-		if (!segment.getType().equals(SEGMENT_TYPE)) {
-			return Optional.empty();
+		UniqueId uniqueId = selector.getUniqueId();
+		UniqueId.Segment lastSegment = uniqueId.getLastSegment();
+
+		if (lastSegment.getType().equals(SEGMENT_TYPE)) {
+			return context //
+					.addToParent(() -> selectUniqueId(uniqueId.removeLastSegment()), parent -> {
+						BenchmarkClassDescriptor classDescriptor = (BenchmarkClassDescriptor) parent;
+						return findBenchmarkDescriptor(classDescriptor, lastSegment) //
+								.flatMap(it -> createMethodDescriptor(classDescriptor, ((MethodAware) it).getMethod()));
+					}) //
+					.map(BenchmarkMethodResolver::toResolution) //
+					.orElse(unresolved());
 		}
 
-		if (!(parent instanceof BenchmarkClassDescriptor)) {
-			return Optional.empty();
-		}
-
-		BenchmarkClassDescriptor descriptor = (BenchmarkClassDescriptor) parent;
-
-		return findMethod(segment, parent.getUniqueId(), descriptor.getBenchmarkClass());
+		return unresolved();
 	}
 
-	private Optional<TestDescriptor> findMethod(UniqueId parentId, BenchmarkClass benchmarkClass, Method method) {
-
-		return benchmarkClass.getChildren().stream() //
+	private static Optional<? extends BenchmarkDescriptor> findBenchmarkDescriptor(
+			BenchmarkClassDescriptor classDescriptor, UniqueId.Segment lastSegment) {
+		return classDescriptor.getBenchmarkClass().getChildren().stream() //
 				.filter(MethodAware.class::isInstance) //
-				.filter(it -> ((MethodAware) it).isUnderlyingMethod(method)) //
-				.map(it -> createDescriptor(parentId, it)).findFirst();
-	}
+				.filter(benchmarkDescriptor -> {
 
-	private Optional<TestDescriptor> findMethod(Segment segment, UniqueId parentId, BenchmarkClass benchmarkClass) {
-
-		return benchmarkClass.getChildren().stream() //
-				.filter(MethodAware.class::isInstance) //
-				.filter(it -> {
-
-					Method method = ((MethodAware) it).getMethod();
+					Method method = ((MethodAware) benchmarkDescriptor).getMethod();
 					String id = BenchmarkMethodDescriptor.describeMethodId(method);
 
-					return segment.getValue().equals(id);
+					return lastSegment.getValue().equals(id);
 				}) //
-				.map(it -> createDescriptor(parentId, it)) //
 				.findFirst();
 	}
 
-	private TestDescriptor createDescriptor(UniqueId parentId, BenchmarkDescriptor it) {
+	private static Resolution toResolution(TestDescriptor descriptor) {
+		if (descriptor instanceof ParametrizedBenchmarkMethodDescriptor) {
+			ParametrizedBenchmarkMethodDescriptor parametrizedMethodDescriptor = (ParametrizedBenchmarkMethodDescriptor) descriptor;
+			return Resolution.match(Match.exact(descriptor,
+					() -> parametrizedMethodDescriptor.getParametrizedMethod().getChildren().stream() //
+							.map(it -> selectUniqueId(
+									descriptor.getUniqueId().append(BenchmarkFixtureResolver.SEGMENT_TYPE, it.getDisplayName()))) //
+							.collect(toSet())));
+		}
+		return Resolution.match(Match.exact(descriptor));
+	}
 
-		if (it instanceof ParametrizedBenchmarkMethod) {
-			ParametrizedBenchmarkMethod parametrized = (ParametrizedBenchmarkMethod) it;
+	private static Optional<TestDescriptor> createMethodDescriptor(BenchmarkClassDescriptor parent, Method method) {
+		return parent.getBenchmarkClass().getChildren().stream() //
+				.filter(MethodAware.class::isInstance)
+				.filter(benchmarkDescriptor -> ((MethodAware) benchmarkDescriptor).isUnderlyingMethod(method)) //
+				.findFirst() //
+				.map(benchmarkDescriptor -> toMethodDescriptor(parent, benchmarkDescriptor));
+	}
+
+	private static AbstractBenchmarkDescriptor toMethodDescriptor(BenchmarkClassDescriptor parent,
+			BenchmarkDescriptor benchmarkDescriptor) {
+
+		UniqueId parentId = parent.getUniqueId();
+
+		if (benchmarkDescriptor instanceof ParametrizedBenchmarkMethod) {
+			ParametrizedBenchmarkMethod parametrized = (ParametrizedBenchmarkMethod) benchmarkDescriptor;
 			UniqueId uniqueId = BenchmarkMethodDescriptor.createUniqueId(parentId, parametrized.getDescriptor());
 
 			return new ParametrizedBenchmarkMethodDescriptor(uniqueId, parametrized);
 		}
 
-		BenchmarkMethod benchmarkMethod = (BenchmarkMethod) it;
+		BenchmarkMethod benchmarkMethod = (BenchmarkMethod) benchmarkDescriptor;
 		UniqueId uniqueId = BenchmarkMethodDescriptor.createUniqueId(parentId, benchmarkMethod);
 
 		return new BenchmarkMethodDescriptor(uniqueId, benchmarkMethod);

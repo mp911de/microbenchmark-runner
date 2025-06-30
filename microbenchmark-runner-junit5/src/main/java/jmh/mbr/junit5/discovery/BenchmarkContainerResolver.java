@@ -9,95 +9,80 @@
  */
 package jmh.mbr.junit5.discovery;
 
+import static java.util.stream.Collectors.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
+
 import jmh.mbr.core.model.BenchmarkClass;
 import jmh.mbr.core.model.BenchmarkDescriptorFactory;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.discovery.predicates.IsBenchmarkClass;
+import jmh.mbr.junit5.discovery.predicates.IsBenchmarkMethod;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Predicate;
 
-import org.junit.platform.commons.util.ReflectionUtils;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.discovery.ClassSelector;
+import org.junit.platform.engine.discovery.UniqueIdSelector;
+import org.junit.platform.engine.support.discovery.SelectorResolver;
 
 /**
- * {@link ElementResolver} for test containers. Containers are based on {@link Class classes} that contain
+ * {@link SelectorResolver} for test containers. Containers are based on {@link Class classes} that contain
  * {@code Benchmark} methods.
  *
  * @see IsBenchmarkClass
  */
-class BenchmarkContainerResolver implements ElementResolver {
+class BenchmarkContainerResolver implements SelectorResolver {
 
 	private static final String SEGMENT_TYPE = "class";
 
-	BenchmarkContainerResolver() {}
+	private final Predicate<String> classNameFilter;
 
-	@Override
-	public Set<TestDescriptor> resolveElement(AnnotatedElement element, TestDescriptor parent) {
-
-		if (!(element instanceof Class)) {
-			return Collections.emptySet();
-		}
-
-		Class<?> clazz = (Class<?>) element;
-		if (!isPotentialCandidate(clazz)) {
-			return Collections.emptySet();
-		}
-
-		UniqueId uniqueId = createUniqueId(clazz, parent);
-		return Collections.singleton(resolveClass(clazz, uniqueId));
+	BenchmarkContainerResolver(Predicate<String> classNameFilter) {
+		this.classNameFilter = classNameFilter;
 	}
 
 	@Override
-	public Optional<TestDescriptor> resolveUniqueId(UniqueId.Segment segment, TestDescriptor parent) {
+	public Resolution resolve(ClassSelector selector, Context context) {
+		if (classNameFilter.test(selector.getClassName())) {
+			return resolveClass(selector.getJavaClass(), context);
+		}
+		return Resolution.unresolved();
+	}
 
-		if (!segment.getType().equals(SEGMENT_TYPE)) {
-			return Optional.empty();
+	@Override
+	public Resolution resolve(UniqueIdSelector selector, Context context) {
+		UniqueId uniqueId = selector.getUniqueId();
+		UniqueId.Segment lastSegment = uniqueId.getLastSegment();
+
+		if (lastSegment.getType().equals(SEGMENT_TYPE)) {
+			return ReflectionSupport.tryToLoadClass(lastSegment.getValue()).toOptional()
+					.map(testClass -> resolveClass(testClass, context)).orElse(unresolved());
 		}
 
-		if (!requiredParentType().isInstance(parent)) {
-			return Optional.empty();
+		return unresolved();
+	}
+
+	private Resolution resolveClass(Class<?> testClass, Context context) {
+		if (IsBenchmarkClass.INSTANCE.test(testClass)) {
+			return context.addToParent(parent -> createClassDescriptor(testClass, parent))
+					.map(descriptor -> Resolution.match(Match.exact(descriptor,
+							() -> ReflectionSupport
+									.streamMethods(testClass, IsBenchmarkMethod.INSTANCE, HierarchyTraversalMode.TOP_DOWN)
+									.map(m -> selectMethod(testClass, m)).collect(toSet())))) //
+					.orElse(unresolved());
 		}
-
-		String className = getClassName(parent, segment.getValue());
-
-		Optional<Class<?>> optionalContainerClass = ReflectionUtils.loadClass(className);
-		if (!optionalContainerClass.isPresent()) {
-			return Optional.empty();
-		}
-
-		Class<?> containerClass = optionalContainerClass.get();
-		if (!isPotentialCandidate(containerClass)) {
-			return Optional.empty();
-		}
-
-		UniqueId uniqueId = createUniqueId(containerClass, parent);
-		return Optional.of(resolveClass(containerClass, uniqueId));
+		return unresolved();
 	}
 
-	private Class<? extends TestDescriptor> requiredParentType() {
-		return TestDescriptor.class;
+	private static Optional<BenchmarkClassDescriptor> createClassDescriptor(Class<?> testClass, TestDescriptor parent) {
+		UniqueId uniqueId = parent.getUniqueId().append(BenchmarkContainerResolver.SEGMENT_TYPE, testClass.getName());
+		BenchmarkClass descriptor = BenchmarkDescriptorFactory.create(testClass).createDescriptor();
+		return Optional.of(new BenchmarkClassDescriptor(uniqueId, descriptor));
 	}
 
-	private String getClassName(TestDescriptor parent, String segmentValue) {
-		return segmentValue;
-	}
-
-	private boolean isPotentialCandidate(Class<?> element) {
-		return IsBenchmarkClass.INSTANCE.test(element);
-	}
-
-	private UniqueId createUniqueId(Class<?> benchmarkClass, TestDescriptor parent) {
-		return parent.getUniqueId().append(SEGMENT_TYPE, benchmarkClass.getName());
-	}
-
-	private TestDescriptor resolveClass(Class<?> benchmarkClass, UniqueId uniqueId) {
-
-		BenchmarkClass descriptor = BenchmarkDescriptorFactory.create(benchmarkClass).createDescriptor();
-
-		return new BenchmarkClassDescriptor(uniqueId, descriptor);
-	}
 }
