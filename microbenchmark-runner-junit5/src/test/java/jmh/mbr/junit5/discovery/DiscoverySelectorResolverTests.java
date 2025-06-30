@@ -9,45 +9,42 @@
  */
 package jmh.mbr.junit5.discovery;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.platform.engine.discovery.ClassNameFilter.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+
+import jmh.mbr.junit5.MicrobenchmarkEngine;
 import jmh.mbr.junit5.PartiallyParametrizedBenchmark;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
 import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 
-import static org.assertj.core.api.Assertions.*;
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.support.scanning.ClassFilter;
+import org.junit.platform.engine.Filter;
 import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.discovery.DiscoverySelectors;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
+import org.junit.platform.testkit.engine.EngineDiscoveryResults;
+import org.junit.platform.testkit.engine.EngineTestKit;
 
 /**
- * Unit tests for {@link JavaElementsResolver}.
+ * Tests for {@link DiscoverySelectorResolver}.
  */
-class JavaElementsResolverUnitTests {
-
-	private final TestDescriptor ENGINE = new AbstractTestDescriptor(UniqueId.forEngine("foo"), "foo") {
-		@Override
-		public Type getType() {
-			return Type.CONTAINER;
-		}
-	};
-
-	private final ClassFilter FILTER = ClassFilter.of(it -> true);
+class DiscoverySelectorResolverTests {
 
 	@Test
 	void shouldResolveClassByPackageSelector() {
 
-		JavaElementsResolver resolver = new JavaElementsResolver(ENGINE,
-				ClassFilter.of(it -> it.equals(PartiallyParametrizedBenchmark.class)), ElementResolvers.getResolvers());
+		EngineDiscoveryResults results = EngineTestKit.engine(new MicrobenchmarkEngine())
+				.selectors(selectPackage(PartiallyParametrizedBenchmark.class.getPackage().getName()))
+				.filters((Filter<?>) includeClassNamePatterns(Pattern.quote(PartiallyParametrizedBenchmark.class.getName())))
+				.discover();
 
-		resolver
-				.resolvePackage(DiscoverySelectors.selectPackage(PartiallyParametrizedBenchmark.class.getPackage().getName()));
+		TestDescriptor engineDescriptor = results.getEngineDescriptor();
 
-		assertThat(ENGINE.getChildren()).hasSize(1);
+		assertThat(engineDescriptor.getChildren()).hasSize(1);
 
-		TestDescriptor classDescriptor = ENGINE.getChildren().iterator().next();
+		TestDescriptor classDescriptor = engineDescriptor.getChildren().iterator().next();
 
 		assertBenchmarkClass(classDescriptor);
 
@@ -60,13 +57,14 @@ class JavaElementsResolverUnitTests {
 	@Test
 	void shouldResolveClassByClassSelector() {
 
-		JavaElementsResolver resolver = new JavaElementsResolver(ENGINE, FILTER, ElementResolvers.getResolvers());
+		EngineDiscoveryResults results = EngineTestKit.engine(new MicrobenchmarkEngine())
+				.selectors(selectClass(PartiallyParametrizedBenchmark.class)).discover();
 
-		resolver.resolveClass(DiscoverySelectors.selectClass(PartiallyParametrizedBenchmark.class));
+		TestDescriptor engineDescriptor = results.getEngineDescriptor();
 
-		assertThat(ENGINE.getChildren()).hasSize(1);
+		assertThat(engineDescriptor.getChildren()).hasSize(1);
 
-		TestDescriptor classDescriptor = ENGINE.getChildren().iterator().next();
+		TestDescriptor classDescriptor = engineDescriptor.getChildren().iterator().next();
 
 		assertBenchmarkClass(classDescriptor);
 
@@ -79,14 +77,16 @@ class JavaElementsResolverUnitTests {
 	@Test
 	void shouldResolveBenchmarkMethodByMethodSelector() {
 
-		JavaElementsResolver resolver = new JavaElementsResolver(ENGINE, FILTER, ElementResolvers.getResolvers());
+		EngineDiscoveryResults results = EngineTestKit.engine(new MicrobenchmarkEngine())
+				.selectors(selectMethod(PartiallyParametrizedBenchmark.class, "bar",
+						"jmh.mbr.junit5.PartiallyParametrizedBenchmark$ParamState"))
+				.discover();
 
-		resolver.resolveMethod(DiscoverySelectors.selectMethod(PartiallyParametrizedBenchmark.class, "bar",
-				"jmh.mbr.junit5.PartiallyParametrizedBenchmark$ParamState"));
+		TestDescriptor engineDescriptor = results.getEngineDescriptor();
 
-		assertThat(ENGINE.getChildren()).hasSize(1);
+		assertThat(engineDescriptor.getChildren()).hasSize(1);
 
-		TestDescriptor classDescriptor = ENGINE.getChildren().iterator().next();
+		TestDescriptor classDescriptor = engineDescriptor.getChildren().iterator().next();
 
 		assertBenchmarkClass(classDescriptor);
 
@@ -99,14 +99,15 @@ class JavaElementsResolverUnitTests {
 	@Test
 	void shouldResolveBenchmarkMethodByUniqueIdSelector() {
 
-		JavaElementsResolver resolver = new JavaElementsResolver(ENGINE, FILTER, ElementResolvers.getResolvers());
+		EngineDiscoveryResults results = EngineTestKit.engine(new MicrobenchmarkEngine()).selectors(selectUniqueId(
+				"[engine:microbenchmark-engine]/[class:jmh.mbr.junit5.PartiallyParametrizedBenchmark]/[method:bar(jmh.mbr.junit5.PartiallyParametrizedBenchmark$ParamState)]/[fixture:%5Bfoo=b%5D]"))
+				.discover();
 
-		resolver.resolveUniqueId(DiscoverySelectors.selectUniqueId(
-				"[engine:microbenchmark-engine]/[class:jmh.mbr.junit5.PartiallyParametrizedBenchmark]/[method:bar(jmh.mbr.junit5.PartiallyParametrizedBenchmark$ParamState)]/[fixture:%5Bfoo=b%5D]"));
+		TestDescriptor engineDescriptor = results.getEngineDescriptor();
 
-		assertThat(ENGINE.getChildren()).hasSize(1);
+		assertThat(engineDescriptor.getChildren()).hasSize(1);
 
-		TestDescriptor classDescriptor = ENGINE.getChildren().iterator().next();
+		TestDescriptor classDescriptor = engineDescriptor.getChildren().iterator().next();
 
 		assertBenchmarkClass(classDescriptor);
 
