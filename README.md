@@ -22,10 +22,10 @@ Here is a quick teaser of a what Microbenchmark Runner can do for you:
 @Microbenchmark
 public class SimpleBenchmark {
 
-    @State
+	@State
 	static class MyParameters {
 
-		@Param({"1", "10", "100"})  // renders parametrized benchmarks as sub-tests
+		@Param({"1", "10", "100"})  // renders parametrized benchmarks as nested tests
 		String batchSize;
 	}
 
@@ -59,7 +59,7 @@ public class SimpleBenchmark {
 	@State
 	static class MyParameters {
 
-		@Param({"1", "10", "100"}) // renders parametrized benchmarks as sub-tests
+		@Param({"1", "10", "100"}) // renders parametrized benchmarks as nested tests
 		String batchSize;
 	}
 
@@ -82,10 +82,10 @@ Add the following repository to your `pom.xml` (when using Maven):
 
 ```xml
 <repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
 </repositories>
 ```
 
@@ -94,17 +94,17 @@ and one of the dependencies:
 ```xml
 
 <dependency>
-    <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-    <artifactId>microbenchmark-runner-junit</artifactId>
-    <version>${version}.RELEASE</version>
+	<groupId>com.github.mp911de.microbenchmark-runner</groupId>
+	<artifactId>microbenchmark-runner-junit</artifactId>
+	<version>${version}</version>
 </dependency>
 ```
 
 ```xml
 <dependency>
-    <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-    <artifactId>microbenchmark-runner-junit4</artifactId>
-    <version>${version}.RELEASE</version>
+	<groupId>com.github.mp911de.microbenchmark-runner</groupId>
+	<artifactId>microbenchmark-runner-junit4</artifactId>
+	<version>${version}</version>
 </dependency>
 ```
 
