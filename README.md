@@ -3,7 +3,8 @@ Microbenchmark Runner
 
 [![](https://jitpack.io/v/mp911de/microbenchmark-runner.svg)](https://jitpack.io/#mp911de/microbenchmark-runner) [![CI](https://github.com/mp911de/microbenchmark-runner/actions/workflows/ci.yml/badge.svg)](https://github.com/mp911de/microbenchmark-runner/actions/workflows/ci.yml)
 
-Microbenchmark Runner is a JUnit (JUnit 4.12/JUnit 5.5) extension to launch JMH benchmarks using JUnit directly by using existing JUnit integrations.
+Microbenchmark Runner is a JUnit (JUnit 6 and JUnit 4.12) extension to launch JMH
+benchmarks using JUnit directly by using existing JUnit integrations.
 
 ### Microbenchmark Runner is and what it isn't
 
@@ -15,27 +16,7 @@ During development time, we want quick turnaround times and an IDE that makes it
 
 Here is a quick teaser of a what Microbenchmark Runner can do for you:
 
-### JUnit 4.x
-
-```java
-@RunWith(Microbenchmark.class)
-public class SimpleBenchmark {
-
-    @State
-    static class MyParameters {
-
-        @Param({"1", "10", "100"}) // renders parametrized benchmarks as sub-tests
-        String batchSize;
-    }
-    
-    @Benchmark
-    public void foo(MyParameters myParameters) {}
-}
-```
-
-Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're able to leverage your IDE to start JMH benchmarks without fighting the command line. 
-
-### JUnit 5.10.x
+### JUnit 5 and 6
 
 ```java
 @Microbenchmark
@@ -56,16 +37,40 @@ public class SimpleBenchmark {
 
 **Compatibility matrix**
 
-| MBR Version | JUnit 5 Version |
-|-------------|-----------------|
-| 0.2.x       | 5.5+            |
-| 0.3.x       | 5.8+            |
-| 0.4.x       | 5.10+           |
-| 0.5.x       | 5.12+           |
-| 0.6.x       | 5.13+           |
+| MBR Version | JUnit  Version |
+|-------------|----------------|
+| 1.0.x       | 6.0+           |
+| 0.5.x       | 5.12+          |
+| 0.6.x       | 5.13+          |
+| 0.4.x       | 5.10+          |
+| 0.3.x       | 5.8+           |
+| 0.2.x       | 5.5+           |
 
 Annotate your JMH benchmark with `@Microbenchmark`. Now you're able to leverage your IDE
 to start JMH benchmarks without fighting the command line.
+
+### JUnit 4.x
+
+```java
+
+@RunWith(Microbenchmark.class)
+public class SimpleBenchmark {
+
+	@State
+	static class MyParameters {
+
+		@Param({"1", "10", "100"}) // renders parametrized benchmarks as sub-tests
+		String batchSize;
+	}
+
+	@Benchmark
+	public void foo(MyParameters myParameters) {
+	}
+}
+```
+
+Decorate your JMH benchmark with `@RunWith(Microbenchmark.class)`. Now you're able to
+leverage your IDE to start JMH benchmarks without fighting the command line.
 
 # Integrate it in your project
 
@@ -87,9 +92,10 @@ Add the following repository to your `pom.xml` (when using Maven):
 and one of the dependencies:
 
 ```xml
+
 <dependency>
     <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-    <artifactId>microbenchmark-runner-junit4</artifactId>
+    <artifactId>microbenchmark-runner-junit</artifactId>
     <version>${version}.RELEASE</version>
 </dependency>
 ```
@@ -97,7 +103,7 @@ and one of the dependencies:
 ```xml
 <dependency>
     <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-	<artifactId>microbenchmark-runner-junit</artifactId>
+    <artifactId>microbenchmark-runner-junit4</artifactId>
     <version>${version}.RELEASE</version>
 </dependency>
 ```
@@ -141,7 +147,8 @@ Microbenchmark Runner uses GitHub’s integrated issue tracking system to record
 
 # Building from Source
 
-If you want to try out the latest and greatest, Microbenchmark Runner can be easily built with the [maven wrapper](https://github.com/takari/maven-wrapper). You also need JDK 1.8.
+If you want to try out the latest and greatest, Microbenchmark Runner can be easily built
+with the [maven wrapper](https://github.com/takari/maven-wrapper). You also need JDK 17.
 
 ```
 $ ./mvnw clean install
