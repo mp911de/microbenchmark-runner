@@ -149,4 +149,5 @@ $ ./mvnw clean install
 
 # License
 
-Microbenchmark Runner is Open Source software released under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).
+Microbenchmark Runner is Open Source software released under
+the [Eclipse Public License - v 2.0](https://www.eclipse.org/legal/epl-2.0/).
