@@ -42,6 +42,7 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.reporting.OutputDirectoryProvider;
 import org.junit.platform.engine.reporting.ReportEntry;
+import org.junit.platform.engine.support.discovery.DiscoveryIssueReporter;
 import org.junit.platform.engine.support.store.NamespacedHierarchicalStore;
 import org.openjdk.jmh.annotations.Benchmark;
 
@@ -55,7 +56,8 @@ public class JmhRunnerUnitTests {
 	JmhRunnerStub runner;
 
 	{
-		MbrConfiguration configuration = new DefaultMbrConfiguration(EmptyConfigurationParameters.INSTANCE, EmptyOutputDirectoryProvider.INSTANCE, new NamespacedHierarchicalStore(null).newChild());
+		MbrConfiguration configuration = new DefaultMbrConfiguration(EmptyConfigurationParameters.INSTANCE, EmptyOutputDirectoryProvider.INSTANCE, DiscoveryIssueReporter.consuming(ignore -> {
+		}), new NamespacedHierarchicalStore(null).newChild());
 		runner = new JmhRunnerStub(configuration, MutableExtensionRegistry
 				.createRegistryWithDefaultExtensions(configuration)) {
 		};
@@ -126,7 +128,8 @@ public class JmhRunnerUnitTests {
 		CapturingConfigurationParameters parameters = new CapturingConfigurationParameters(Collections
 				.singletonMap("jmh.mbr.project", "my beloved one!"));
 
-		MbrConfiguration configuration = new DefaultMbrConfiguration(parameters, EmptyOutputDirectoryProvider.INSTANCE, new NamespacedHierarchicalStore(null).newChild());
+		MbrConfiguration configuration = new DefaultMbrConfiguration(parameters, EmptyOutputDirectoryProvider.INSTANCE, DiscoveryIssueReporter.consuming(ignore -> {
+		}), new NamespacedHierarchicalStore(null).newChild());
 		JmhRunnerStub runner = new JmhRunnerStub(configuration, MutableExtensionRegistry
 				.createRegistryWithDefaultExtensions(configuration)) {
 		};
@@ -218,11 +221,6 @@ public class JmhRunnerUnitTests {
 			return get(key).map(Boolean::parseBoolean);
 		}
 
-		@Override
-		public int size() {
-			return 1;
-		}
-
 		public void verifyKeyRequested(String... keys) {
 
 			for (String key : keys) {
@@ -253,11 +251,6 @@ public class JmhRunnerUnitTests {
 		@Override
 		public Optional<Boolean> getBoolean(String key) {
 			return Optional.empty();
-		}
-
-		@Override
-		public int size() {
-			return 0;
 		}
 
 		@Override

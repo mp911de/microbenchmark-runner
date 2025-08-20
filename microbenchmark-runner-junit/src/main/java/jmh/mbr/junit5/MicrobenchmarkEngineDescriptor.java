@@ -9,6 +9,7 @@
  */
 package jmh.mbr.junit5;
 
+import jmh.mbr.junit5.config.MbrDiscoveryConfiguration;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
@@ -17,7 +18,14 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
  */
 class MicrobenchmarkEngineDescriptor extends EngineDescriptor {
 
-	MicrobenchmarkEngineDescriptor(UniqueId uniqueId) {
+	private final MbrDiscoveryConfiguration configuration;
+
+	MicrobenchmarkEngineDescriptor(UniqueId uniqueId, MbrDiscoveryConfiguration configuration) {
 		super(uniqueId, "Microbenchmark Runner");
+		this.configuration = configuration;
+	}
+
+	public MbrDiscoveryConfiguration getConfiguration() {
+		return configuration;
 	}
 }

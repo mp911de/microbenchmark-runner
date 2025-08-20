@@ -28,6 +28,7 @@ import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.discovery.DiscoveryIssueReporter;
 import org.junit.platform.engine.support.store.NamespacedHierarchicalStore;
 import org.openjdk.jmh.annotations.Benchmark;
 
@@ -38,7 +39,8 @@ import static org.assertj.core.api.Assertions.*;
  */
 public class ConditionEvaluatorUnitTests {
 
-	MbrConfiguration configuration = new DefaultMbrConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE, EmptyOutputDirectoryProvider.INSTANCE, new NamespacedHierarchicalStore(null).newChild());
+	MbrConfiguration configuration = new DefaultMbrConfiguration(JmhRunnerUnitTests.EmptyConfigurationParameters.INSTANCE, EmptyOutputDirectoryProvider.INSTANCE, DiscoveryIssueReporter.consuming(ignore -> {
+	}), new NamespacedHierarchicalStore(null).newChild());
 
 	@Test
 	void shouldRunWithoutCondition() {
@@ -129,12 +131,6 @@ public class ConditionEvaluatorUnitTests {
 		@Override
 		public Optional<Boolean> getBoolean(String key) {
 			return Optional.empty();
-		}
-
-
-		@Override
-		public int size() {
-			return 0;
 		}
 
 		@Override

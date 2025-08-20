@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.ExecutableInvoker;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.MediaType;
@@ -187,7 +188,8 @@ abstract class AbstractExtensionContext<T extends TestDescriptor> implements Ext
 	}
 
 	@Override
-	public <V> Optional<V> getConfigurationParameter(String key, Function<String, V> transformer) {
+	public <V> Optional<V> getConfigurationParameter(String key,
+			Function<? super String, ? extends @Nullable V> transformer) {
 		return this.configuration.getRawConfigurationParameter(key, transformer);
 	}
 

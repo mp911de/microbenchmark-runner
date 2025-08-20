@@ -2,38 +2,53 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>microbenchmark-runner-parent</artifactId>
-        <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-	    <version>1.0.0-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>microbenchmark-runner-parent</artifactId>
+		<groupId>com.github.mp911de.microbenchmark-runner</groupId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>microbenchmark-runner-junit-smoke-tests</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-	        <artifactId>microbenchmark-runner-junit</artifactId>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>17</source>
+						<target>17</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.mp911de.microbenchmark-runner</groupId>
+			<artifactId>microbenchmark-runner-junit</artifactId>
 			<version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-            <artifactId>microbenchmark-runner-extras</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.mp911de.microbenchmark-runner</groupId>
+			<artifactId>microbenchmark-runner-extras</artifactId>
 			<version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>7.5.0</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<version>${jmh.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-high-level-client</artifactId>
+			<version>7.5.0</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 </project>
