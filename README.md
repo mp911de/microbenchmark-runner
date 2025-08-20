@@ -97,7 +97,7 @@ and one of the dependencies:
 ```xml
 <dependency>
     <groupId>com.github.mp911de.microbenchmark-runner</groupId>
-    <artifactId>microbenchmark-runner-junit5</artifactId>
+	<artifactId>microbenchmark-runner-junit</artifactId>
     <version>${version}.RELEASE</version>
 </dependency>
 ```
