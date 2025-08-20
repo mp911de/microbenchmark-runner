@@ -7,10 +7,10 @@
 	<parent>
 		<groupId>com.github.mp911de.microbenchmark-runner</groupId>
 		<artifactId>microbenchmark-runner-parent</artifactId>
-		<version>0.7.0.BUILD-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>microbenchmark-runner-junit5</artifactId>
+	<artifactId>microbenchmark-runner-junit</artifactId>
 
 	<dependencies>
 

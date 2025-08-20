@@ -9,8 +9,7 @@
  */
 package jmh.mbr.junit5.discovery;
 
-import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
-import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
+import java.util.Optional;
 
 import jmh.mbr.core.model.BenchmarkFixture;
 import jmh.mbr.core.model.BenchmarkMethod;
@@ -18,13 +17,13 @@ import jmh.mbr.core.model.ParametrizedBenchmarkMethod;
 import jmh.mbr.junit5.descriptor.AbstractBenchmarkDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkFixtureDescriptor;
 import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
-
-import java.util.Optional;
-
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.discovery.SelectorResolver;
+
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
 
 /**
  * {@link SelectorResolver} for {@link jmh.mbr.core.model.BenchmarkFixture fixtures}.

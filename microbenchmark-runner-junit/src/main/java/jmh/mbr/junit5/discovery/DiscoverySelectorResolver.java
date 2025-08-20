@@ -10,7 +10,6 @@
 package jmh.mbr.junit5.discovery;
 
 import jmh.mbr.junit5.discovery.predicates.IsBenchmarkClass;
-
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.discovery.EngineDiscoveryRequestResolver;

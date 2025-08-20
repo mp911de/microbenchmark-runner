@@ -9,23 +9,22 @@
  */
 package jmh.mbr.junit5.discovery;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.platform.engine.discovery.ClassNameFilter.*;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+import java.util.regex.Pattern;
 
 import jmh.mbr.junit5.MicrobenchmarkEngine;
 import jmh.mbr.junit5.PartiallyParametrizedBenchmark;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
 import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
-
-import java.util.regex.Pattern;
-
 import org.junit.jupiter.api.Test;
 import org.junit.platform.engine.Filter;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.testkit.engine.EngineDiscoveryResults;
 import org.junit.platform.testkit.engine.EngineTestKit;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.platform.engine.discovery.ClassNameFilter.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
 
 /**
  * Tests for {@link DiscoverySelectorResolver}.

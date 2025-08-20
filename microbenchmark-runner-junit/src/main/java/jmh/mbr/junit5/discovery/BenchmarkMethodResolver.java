@@ -9,9 +9,8 @@
  */
 package jmh.mbr.junit5.discovery;
 
-import static java.util.stream.Collectors.*;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
-import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
+import java.lang.reflect.Method;
+import java.util.Optional;
 
 import jmh.mbr.core.model.BenchmarkDescriptor;
 import jmh.mbr.core.model.BenchmarkMethod;
@@ -22,15 +21,15 @@ import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
 import jmh.mbr.junit5.descriptor.ParametrizedBenchmarkMethodDescriptor;
 import jmh.mbr.junit5.discovery.predicates.IsBenchmarkMethod;
-
-import java.lang.reflect.Method;
-import java.util.Optional;
-
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.discovery.SelectorResolver;
+
+import static java.util.stream.Collectors.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
 
 /**
  * {@link SelectorResolver} for {@code Benchmark} {@link Method methods}.

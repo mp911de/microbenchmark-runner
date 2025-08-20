@@ -9,8 +9,6 @@
  */
 package jmh.mbr.junit5.descriptor;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.Collections;
 
 import jmh.mbr.core.model.BenchmarkClass;
@@ -19,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.launcher.PostDiscoveryFilter;
 import org.junit.platform.launcher.TagFilter;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Unit tests for {@link BenchmarkClassDescriptor}.

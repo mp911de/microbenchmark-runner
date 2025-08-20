@@ -9,19 +9,14 @@
  */
 package jmh.mbr.junit5.discovery;
 
-import static java.util.stream.Collectors.*;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
-import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import jmh.mbr.core.model.BenchmarkClass;
 import jmh.mbr.core.model.BenchmarkDescriptorFactory;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.discovery.predicates.IsBenchmarkClass;
 import jmh.mbr.junit5.discovery.predicates.IsBenchmarkMethod;
-
-import java.util.Optional;
-import java.util.function.Predicate;
-
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.TestDescriptor;
@@ -29,6 +24,10 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.discovery.SelectorResolver;
+
+import static java.util.stream.Collectors.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
+import static org.junit.platform.engine.support.discovery.SelectorResolver.Resolution.*;
 
 /**
  * {@link SelectorResolver} for test containers. Containers are based on {@link Class classes} that contain

@@ -9,8 +9,6 @@
  */
 package jmh.mbr.junit5.execution;
 
-import static java.lang.String.*;
-
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -18,6 +16,8 @@ import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 import org.junit.platform.commons.util.StringUtils;
+
+import static java.lang.String.*;
 
 /**
  * Evaluates conditions for a benchmark class/benchmark method.

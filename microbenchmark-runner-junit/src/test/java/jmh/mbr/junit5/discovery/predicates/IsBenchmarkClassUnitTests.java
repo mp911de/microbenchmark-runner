@@ -9,12 +9,12 @@
  */
 package jmh.mbr.junit5.discovery.predicates;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Benchmark;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Unit tests for {@link IsBenchmarkClass}.
