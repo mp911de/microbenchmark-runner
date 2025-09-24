@@ -23,9 +23,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.MediaType;
 import org.junit.jupiter.api.extension.ExecutableInvoker;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.MediaType;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -252,7 +252,8 @@ abstract class AbstractExtensionContext<T extends TestDescriptor> implements Ext
 
 	private Path createOutputDirectory() {
 		try {
-			return this.configuration.getOutputDirectoryProvider().createOutputDirectory(this.benchmarkDescriptor);
+			return this.configuration.getOutputDirectoryCreator()
+					.createOutputDirectory(this.benchmarkDescriptor);
 		} catch (IOException e) {
 			throw new JUnitException("Failed to create output directory", e);
 		}
