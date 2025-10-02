@@ -29,7 +29,7 @@
 		<jmh.version>1.37</jmh.version>
 		<assertj.version>3.27.6</assertj.version>
 		<junit4.version>4.13.1</junit4.version>
-		<junit.version>6.0.0-RC3</junit.version>
+		<junit.version>6.0.0</junit.version>
 	</properties>
 
 	<url>http://github.com/mp911de/microbenchmark-runner</url>
