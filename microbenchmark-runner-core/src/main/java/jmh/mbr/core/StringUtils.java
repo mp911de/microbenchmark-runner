@@ -38,6 +38,16 @@ public class StringUtils {
 		return (theString != null && !theString.isEmpty() && containsText(theString));
 	}
 
+	/**
+	 * Check whether the given {@link String} is not blank.
+	 *
+	 * @param theString the {@link String} to check (may be {@code null})
+	 * @return {@code true} if the string has text
+	 */
+	public static boolean isNotBlank(String theString) {
+		return hasText(theString);
+	}
+
 	private static boolean containsText(CharSequence str) {
 
 		int length = str.length();
@@ -61,7 +71,7 @@ public class StringUtils {
 	 */
 	public static String collectionToDelimitedString(Collection<?> c, String delim) {
 
-		if (c.isEmpty()) {
+		if (c == null || c.isEmpty()) {
 			return "";
 		}
 
@@ -74,5 +84,32 @@ public class StringUtils {
 			}
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Trim whitespace from the beginning and end of a String.
+	 *
+	 * @param str the String to trim (may be {@code null})
+	 * @return the trimmed String, or {@code null} if empty after trimming
+	 */
+	public static String trimToNull(String str) {
+		if (str == null) {
+			return null;
+		}
+		String trimmed = str.trim();
+		return trimmed.isEmpty() ? null : trimmed;
+	}
+
+	/**
+	 * Trim whitespace from the beginning and end of a String.
+	 *
+	 * @param str the String to trim (may be {@code null})
+	 * @return the trimmed String, or empty string if {@code null}
+	 */
+	public static String trimToEmpty(String str) {
+		if (str == null) {
+			return "";
+		}
+		return str.trim();
 	}
 }

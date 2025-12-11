@@ -14,9 +14,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import jmh.mbr.core.model.BenchmarkResults;
 import org.openjdk.jmh.annotations.Mode;
@@ -110,7 +110,7 @@ public class JmhSupport {
 			sb.append("_");
 		}
 
-		sb.append(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+		sb.append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 		sb.append("_");
 		sb.append(jmhTestClass.getSimpleName());
 		sb.append(".json");
@@ -222,12 +222,17 @@ public class JmhSupport {
 		File file = new File(reportFilePath);
 
 		if (file.exists()) {
-			file.delete();
+			if (!file.delete()) {
+				throw new IOException("Failed to delete existing report file: " + reportFilePath);
+			}
 		}
 		else {
-
-			file.getParentFile().mkdirs();
-			file.createNewFile();
+			File parentFile = file.getParentFile();
+			if (parentFile != null && !parentFile.exists()) {
+				if (!parentFile.mkdirs()) {
+					throw new IOException("Failed to create report directory: " + parentFile);
+				}
+			}
 		}
 
 		optionsBuilder.resultFormat(ResultFormatType.JSON);

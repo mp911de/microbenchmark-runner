@@ -71,7 +71,7 @@ enum EnvironmentBenchmarkConfiguration implements BenchmarkConfiguration {
 	@Override
 	public int getMeasurementBatchSize() {
 		return Environment
-				.getPropertyOrDefault(BenchmarkConfigProperties.MEASUREMENT_ITERATIONS);
+				.getPropertyOrDefault(BenchmarkConfigProperties.MEASUREMENT_BATCH_SIZE);
 	}
 
 	@Override

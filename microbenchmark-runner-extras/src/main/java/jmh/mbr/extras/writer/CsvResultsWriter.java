@@ -47,16 +47,14 @@ class CsvResultsWriter implements ResultsWriter {
 
 			File parent = file.getParentFile();
 			if (parent != null) {
-
-				parent.mkdirs();
-
-				if (parent.exists()) {
-					FileUtils.writeLines(file, Collections.singleton(report));
-					return;
+				if (!parent.exists() && !parent.mkdirs()) {
+					throw new FileNotFoundException("Failed to create parent directory: " + parent);
 				}
+				FileUtils.writeLines(file, Collections.singleton(report));
+				return;
 			}
 
-			throw new FileNotFoundException("Parent directory " + parent + " does not exist");
+			throw new FileNotFoundException("Parent directory is null for file: " + file);
 		}
 		catch (IOException e) {
 			output.println("Write failed: " + e

@@ -86,12 +86,31 @@ public abstract class Environment {
 			return targetType.cast(Boolean.valueOf(value));
 		}
 
+		if (targetType == Integer.class) {
+			try {
+				return targetType.cast(Integer.parseInt(value));
+			}
+			catch (NumberFormatException e) {
+				return configProperty.defaultValue();
+			}
+		}
+
 		if (Long.class.isAssignableFrom(targetType)) {
-			return targetType.cast(Long.parseLong(value));
+			try {
+				return targetType.cast(Long.parseLong(value));
+			}
+			catch (NumberFormatException e) {
+				return configProperty.defaultValue();
+			}
 		}
 
 		if (Duration.class.isAssignableFrom(targetType)) {
-			return targetType.cast(Duration.ofSeconds(Long.parseLong(value)));
+			try {
+				return targetType.cast(Duration.ofSeconds(Long.parseLong(value)));
+			}
+			catch (NumberFormatException e) {
+				return configProperty.defaultValue();
+			}
 		}
 
 		return targetType.cast(value);
